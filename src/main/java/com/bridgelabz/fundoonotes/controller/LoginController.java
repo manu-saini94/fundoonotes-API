@@ -7,13 +7,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundoonotes.dto.LoginDTO;
 import com.bridgelabz.fundoonotes.response.LoginResponse;
-import com.bridgelabz.fundoonotes.service.LoginService;
+
+import com.bridgelabz.fundoonotes.serviceimpl.LoginServiceImpl;
 
 @RestController
 public class LoginController {
 
 	@Autowired
-	LoginService loginService;
+	LoginServiceImpl loginService;
 	
 	@Autowired
 	LoginResponse loginResponse;
@@ -22,7 +23,9 @@ public class LoginController {
 	public String login(@RequestBody LoginDTO logindto)
 	{
 		if(loginService.checkUser(logindto))
+		return loginResponse.getToken(loginService.logger(logindto));
+		else
+		return "User Does Not Exist!!";
 			
-		
 	}
 }
