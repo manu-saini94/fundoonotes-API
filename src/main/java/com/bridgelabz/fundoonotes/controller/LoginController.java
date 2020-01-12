@@ -6,17 +6,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundoonotes.dto.LoginDTO;
+import com.bridgelabz.fundoonotes.response.LoginResponse;
 import com.bridgelabz.fundoonotes.service.LoginService;
 
 @RestController
 public class LoginController {
 
 	@Autowired
-	LoginService loginsevice;
+	LoginService loginService;
+	
+	@Autowired
+	LoginResponse loginResponse;
+	
 	@PostMapping("/login")
 	public String login(@RequestBody LoginDTO logindto)
 	{
-		return null;
+		if(loginService.checkUser(logindto))
+			
 		
 	}
 }
