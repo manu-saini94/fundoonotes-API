@@ -11,9 +11,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundoonotes.dto.UserDTO;
+import com.bridgelabz.fundoonotes.response.UserResponse;
 import com.bridgelabz.fundoonotes.service.UserService;
 
 @RestController
@@ -44,11 +46,16 @@ public class UserController {
     	}
     		else
     		{
-    		return new UserResponse().badrequest("bad request",400,errors);
+    		return new UserResponse().badRequest("bad request",400,errors);
     	}
 	}
-				
+	
+	@PostMapping("/checkemail")
+	public String checkEmail(@RequestParam("jwt") String jwt)
+	{
 		
+	  userService.checkJWT(jwt);
+      return "Email Verified";
 	}
 	
 }
