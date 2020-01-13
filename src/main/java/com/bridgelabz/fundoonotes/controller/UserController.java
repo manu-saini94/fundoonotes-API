@@ -40,8 +40,13 @@ public class UserController {
     	if(errors.size()<1)
     	{
     		userService.createUser(userdto);
+    		return new UserResponse().ok("successfully created",200,errors);
     	}
-        
+    		else
+    		{
+    		return new UserResponse().badrequest("bad request",400,errors);
+    	}
+	}
 				
 		
 	}
