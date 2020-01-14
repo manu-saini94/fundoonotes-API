@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class Utility {
 	
 	private String SECRET_KEY = "SECRET";
+	
+	@Autowired
+	private JavaMailSender javaMailSender;
 	
 	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 	
@@ -60,5 +66,16 @@ public class Utility {
 		
 		public Boolean validateToken(String token) {
 			return (!isTokenExpired(token));
+		}
+		
+		public void sendEMail(String toEmail,String subject,String message)
+		{
+			SimpleMailMessage mail=new SimpleMailMessage();
+			mail.setTo(toEmail);
+			mail.setSubject(subject);
+			mail.setText(message);
+			mail.setFrom("manu.saini931222@gmail.com");
+			System.out.println(mail);
+			javaMailSender.send(mail);
 		}
 }

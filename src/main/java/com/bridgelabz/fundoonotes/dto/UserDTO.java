@@ -9,11 +9,11 @@ public class UserDTO {
 	@NotNull(message=" Username cannot be empty ")
 	private String username;
 	@NotNull(message=" First name cannot be empty")
-	private String Firstname;
+	private String firstname;
 	@NotNull(message=" Last name cannot be empty")
-	private String Lastname;
+	private String lastname;
 	@NotNull(message=" email cannot be empty")
-	@Pattern(regexp = "^[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9] {2,4}$",message=" give a valid email")
+	@Pattern(regexp = "^[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]{2,4}$",message = "give a valid email")
 	private String email;
 	@NotNull
 	private boolean isemailverified;
@@ -31,16 +31,16 @@ public class UserDTO {
 		this.username = username;
 	}
 	public String getFirstname() {
-		return Firstname;
+		return firstname;
 	}
 	public void setFirstname(String firstname) {
-		Firstname = firstname;
+		this.firstname = firstname;
 	}
 	public String getLastname() {
-		return Lastname;
+		return lastname;
 	}
 	public void setLastname(String lastname) {
-		Lastname = lastname;
+		this.lastname = lastname;
 	}
 	public String getEmail() {
 		return email;

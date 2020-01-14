@@ -7,14 +7,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundoonotes.dto.LoginDTO;
 import com.bridgelabz.fundoonotes.response.LoginResponse;
-
-import com.bridgelabz.fundoonotes.serviceimpl.LoginServiceImpl;
+import com.bridgelabz.fundoonotes.service.LoginService;
 
 @RestController
 public class LoginController {
 
 	@Autowired
-	LoginServiceImpl loginService;
+	LoginService loginService;
 	
 	@Autowired
 	LoginResponse loginResponse;

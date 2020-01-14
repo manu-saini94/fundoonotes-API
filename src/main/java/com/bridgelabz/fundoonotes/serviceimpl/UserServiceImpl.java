@@ -21,8 +21,6 @@ import com.bridgelabz.fundoonotes.utility.Utility;
 @Service
 public class UserServiceImpl implements UserService{
 
-	@Autowired
-	private KafkaTemplate<String,String> kafkaTemplate;
 	
 	@Autowired
 	private UserRepository userRepository;
@@ -32,8 +30,9 @@ public class UserServiceImpl implements UserService{
 	
 	private BCryptPasswordEncoder bcrypt;
 	
-	@Autowired
-	private JavaMailSender javaMailSender;
+
+	
+	private String jwt; 
 	
 	@Autowired
 	private Utility utility;
@@ -47,12 +46,12 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public boolean createUser(UserDTO userdto) {
-		// TODO Auto-generated method stub
 	try
 	{
+		System.out.println("iaufhci8ua7gtsf");
 		UserInfo user=modelMapper.map(userdto,UserInfo.class);
-		userRepository.SaveUser(user.getId(),user.getUsername(),user.getFirstname(),user.getLastname(),user.getEmail(),bcrypt.encode(user.getPassword()));
-	    kafkaTemplate.send("verification",user.getEmail());
+		userRepository.save(user);
+	    MailDetails(user.getEmail());
 	    return true;
 	}
 	catch(Exception e)
@@ -62,40 +61,23 @@ public class UserServiceImpl implements UserService{
 	}
 	}
 
-	@KafkaListener(topics="verification",groupId="group-id")
-	public void consume(String message)
-	{
-		MailDetails(message);
-		kafkaTemplate.flush();
-	}
+	
 	
 	public void MailDetails(String email)
 	{
 		UserInfo user=userRepository.findByEmail(email);
 		String jwt=utility.generateToken(new User(user.getUsername(),user.getPassword(),new ArrayList<>()));
-		String url="http://localhost:8082/checkemail?jwt="+jwt;
-		sendEMail(email,"verifying email",url);
+		String url="http://localhost:8080/checkemail?jwt="+jwt;
+		utility.sendEMail(email,"verifying email",url);
 	}
-	
-	
-	public void sendEMail(String toEmail,String subject,String message)
-	{
-		SimpleMailMessage mail=new SimpleMailMessage();
-		mail.setTo(toEmail);
-		mail.setSubject(subject);
-		mail.setText(message);
-		mail.setFrom("manu.saini931222@gmail.com");
-		System.out.println(mail);
-		javaMailSender.send(mail);
-	}
-	
 	
 
 	@Override
-	public void checkJWT(String jwt) {
+	public void checkJWT(String token) {
 		// TODO Auto-generated method stub
-		if(utility.validateToken(jwt))
+		if(token.equals(jwt) && utility.validateToken(jwt))
 		{
+			System.out.println("Verify");
 			userRepository.setVerifiedEmail(utility.getUsernameFromToken(jwt));
 		}
 	}

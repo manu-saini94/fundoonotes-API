@@ -13,23 +13,20 @@ import javax.validation.constraints.NotNull;
 public class UserInfo {
 
 	@Id
-	@NotNull
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
-	@NotNull
 	private String username;
-	@NotNull
 	private String Firstname;
-	@NotNull
+	
     private String Lastname;
-	@NotNull
+	
     private String email;
-	@NotNull
+	
 	@Column(columnDefinition="boolean default false")
     private boolean isemailverified;
-    @NotNull
+    
 	private String password;
-    @NotNull
+    
     @Column(columnDefinition="timestamp default current_timestamp")
 	private Date createddate;
 	
@@ -81,6 +78,12 @@ public class UserInfo {
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	@Override
+	public String toString() {
+		return "UserInfo [id=" + id + ", username=" + username + ", Firstname=" + Firstname + ", Lastname=" + Lastname
+				+ ", email=" + email + ", isemailverified=" + isemailverified + ", password=" + password
+				+ ", createddate=" + createddate + "]";
 	}
 	
 	

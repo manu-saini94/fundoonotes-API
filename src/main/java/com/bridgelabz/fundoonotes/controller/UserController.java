@@ -42,6 +42,7 @@ public class UserController {
     	if(errors.size()<1)
     	{
     		userService.createUser(userdto);
+    		System.out.println("isnide controller");
     		return new UserResponse().ok("successfully created",200,errors);
     	}
     		else
