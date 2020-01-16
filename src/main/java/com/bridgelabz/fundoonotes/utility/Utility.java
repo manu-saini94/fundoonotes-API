@@ -2,14 +2,21 @@ package com.bridgelabz.fundoonotes.utility;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+
+import com.bridgelabz.fundoonotes.dto.UserDTO;
+import com.bridgelabz.fundoonotes.model.UserInfo;
+import com.bridgelabz.fundoonotes.repository.UserRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -22,6 +29,9 @@ public class Utility {
 	
 	@Autowired
 	private JavaMailSender javaMailSender;
+	
+	@Autowired
+	UserRepository userRepository;
 	
 	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 	
@@ -77,5 +87,33 @@ public class Utility {
 			mail.setFrom("manu.saini931222@gmail.com");
 			System.out.println(mail);
 			javaMailSender.send(mail);
+		}
+		
+		public List getErrors(BindingResult result,UserDTO userdto)
+		{
+			List error=result.getAllErrors().stream().map(s->s.getDefaultMessage()).collect(Collectors.toList());
+	        if(!userdto.getPassword().equals(userdto.getPasswordagain()))
+	        {
+	        	error.add("password not matching");
+	        return error;
+	        }
+	        else
+	        return error;
+		}
+		
+		public boolean checkUser(String username)
+		{
+			return userRepository.findByUsername(username)!=null;
+		}
+		
+		public boolean checkVerified(String username)
+		{
+			UserInfo user=userRepository.findByUsername(username);
+			return user.getIsEmailVerified();
+		}
+		
+		public boolean checkMail(String email)
+		{
+			return userRepository.findByEmail(email)!=null;
 		}
 }

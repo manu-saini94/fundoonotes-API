@@ -21,13 +21,21 @@ public class UserInfo {
     private String Lastname;
 	
     private String email;
+    private String password;
 	
 	@Column(columnDefinition="boolean default false")
-    private boolean isemailverified;
+    private boolean isEmailVerified;
     
-	private String password;
+	
+	
     
-    @Column(columnDefinition="timestamp default current_timestamp")
+    public boolean getIsEmailVerified() {
+		return isEmailVerified;
+	}
+	public void setIsEmailVerified(boolean isEmailVerified) {
+		this.isEmailVerified = isEmailVerified;
+	}
+	@Column(columnDefinition="timestamp default current_timestamp")
 	private Date createddate;
 	
 	
@@ -67,12 +75,7 @@ public class UserInfo {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public boolean isIsemailverified() {
-		return isemailverified;
-	}
-	public void setIsemailverified(boolean isemailverified) {
-		this.isemailverified = isemailverified;
-	}
+	
 	public String getPassword() {
 		return password;
 	}
@@ -82,9 +85,10 @@ public class UserInfo {
 	@Override
 	public String toString() {
 		return "UserInfo [id=" + id + ", username=" + username + ", Firstname=" + Firstname + ", Lastname=" + Lastname
-				+ ", email=" + email + ", isemailverified=" + isemailverified + ", password=" + password
+				+ ", email=" + email + ",  isEmailVerified=" + isEmailVerified + ",password=" + password
 				+ ", createddate=" + createddate + "]";
 	}
+
 	
 	
 }
