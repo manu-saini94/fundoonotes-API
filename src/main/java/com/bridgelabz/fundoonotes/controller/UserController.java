@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -83,9 +84,19 @@ public class UserController {
 			throw new MailIDNotFoundException("Not a valid mail id");
 	}
 	
+	@PutMapping("/resetpassword/{jwt}")
 	public ResponseEntity<Response> newPassword(@RequestBody PasswordDTO password,@PathVariable("jwt") String jwt) throws JWTTokenException
 	{
-		return null;
+		if(password.getNewpassword().equals(password.getConfirmnewpassword()))
+		{
+			String resetresult=userService.resetPassword(password.getNewpassword(),jwt);
+			if(resetresult==null)
+			return ResponseEntity.ok().body(new Response(200,"password redefined",null));
+			else
+			return ResponseEntity.badRequest().body(new Response(400,"Token Expired",null));
+		}
+		else
+			return ResponseEntity.badRequest().body(new Response(400,"Password not matching",null));
 		
 	}
 }

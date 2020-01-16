@@ -121,13 +121,20 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 
 	@Override
 	public String resetPassword(String password, String jwt) throws JWTTokenException {
-		// TODO Auto-generated method stub
-		return null;
+		if(utility.validateToken(jwt))
+		{
+		userRepository.changepassword(bcrypt.encode(password),utility.getUsernameFromToken(jwt));
+        return null;
+		}
+		else
+		{
+			throw new JWTTokenException("Not a valid token");
+		}
 	}
 
 	@Override
 	public void forgotPassword(ForgotDTO forgotdto) {
-		// TODO Auto-generated method stub
+		
 	try {
 			
 			UserInfo user=modelMapper.map(forgotdto,UserInfo.class);

@@ -31,4 +31,6 @@ public interface UserRepository extends JpaRepository<UserInfo,Integer> {
 	@Modifying
 	public void setVerifiedEmail(String username);
 	
+	
+	
 }
