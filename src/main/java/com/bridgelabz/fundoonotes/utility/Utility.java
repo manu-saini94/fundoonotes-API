@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -115,5 +117,12 @@ public class Utility {
 		public boolean checkMail(String email)
 		{
 			return userRepository.findByEmail(email)!=null;
+		}
+		
+		@Cacheable(value="cacheExec",key="#jwt")
+		public UserInfo getUser(String jwt)
+		{
+			UserInfo user=userRepository.findByUsername(getUsernameFromToken(jwt));
+			return user;
 		}
 }

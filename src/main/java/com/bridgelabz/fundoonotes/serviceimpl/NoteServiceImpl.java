@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.bridgelabz.fundoonotes.Exceptions.JWTTokenException;
 import com.bridgelabz.fundoonotes.dto.NoteDTO;
+import com.bridgelabz.fundoonotes.model.UserInfo;
 import com.bridgelabz.fundoonotes.repository.NoteRepository;
 import com.bridgelabz.fundoonotes.service.NoteNotFoundException;
 import com.bridgelabz.fundoonotes.service.NoteService;
@@ -32,7 +33,22 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 	@Override
 	public boolean saveNewNoteImpl(NoteDTO notedto, String jwt) throws JWTTokenException, UserException {
 	
-		
+		UserInfo user=utility.getUser(jwt);
+		if(user!=null)
+		{
+			int notesid;
+			try
+			{
+				notesid=noteRepository.giveMaxId()+1;
+			}
+			catch(NullPointerException e)
+			{
+				notesid=1;
+			}
+			List<Label>
+			Notes notes=new Notes(notedto.getTitle(),notedto.getTakeanote(),notedto.getReminder(),notedto.getColor());
+			
+		}
 		
 	}
 
