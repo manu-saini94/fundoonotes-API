@@ -1,17 +1,17 @@
 package com.bridgelabz.fundoonotes.dto;
 
-import java.util.List;
 
 public class NoteDTO {
 
 	private String title;
+	
 	private String takeanote;
-	private boolean isarchieve;
-	private boolean ispinned;
+	private boolean trashed;
+	private boolean archieved;
+	private boolean pinned;
 	private String color;
 	private String reminder;
-	private List<String> label;
-	private List<String> images;
+	
 	
 	public String getTitle() {
 		return title;
@@ -25,17 +25,18 @@ public class NoteDTO {
 	public void setTakeanote(String takeanote) {
 		this.takeanote = takeanote;
 	}
-	public boolean isIsarchieve() {
-		return isarchieve;
+	
+	public boolean isArchieved() {
+		return archieved;
 	}
-	public void setIsarchieve(boolean isarchieve) {
-		this.isarchieve = isarchieve;
+	public void setArchieved(boolean archieved) {
+		this.archieved = archieved;
 	}
-	public boolean isIspinned() {
-		return ispinned;
+	public boolean isPinned() {
+		return pinned;
 	}
-	public void setIspinned(boolean ispinned) {
-		this.ispinned = ispinned;
+	public void setPinned(boolean pinned) {
+		this.pinned = pinned;
 	}
 	public String getColor() {
 		return color;
@@ -49,16 +50,11 @@ public class NoteDTO {
 	public void setReminder(String reminder) {
 		this.reminder = reminder;
 	}
-	public List<String> getLabel() {
-		return label;
+	public boolean isTrashed() {
+		return trashed;
 	}
-	public void setLabel(List<String> label) {
-		this.label = label;
+	public void setTrashed(boolean trashed) {
+		this.trashed = trashed;
 	}
-	public List<String> getImages() {
-		return images;
-	}
-	public void setImages(List<String> images) {
-		this.images = images;
-	}
+	
 }

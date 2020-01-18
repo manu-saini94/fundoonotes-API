@@ -13,9 +13,9 @@ import com.bridgelabz.fundoonotes.model.UserInfo;
 @Transactional
 public interface UserRepository extends JpaRepository<UserInfo,Integer> {
 
-	@Query(value="insert into user_info(id,username,firstname,lastname,email,password) values(:id,:username,:firstname,:lastname,:email,:password)",nativeQuery=true)
+	@Query(value="insert into user_info(username,firstname,lastname,email,password) values(:username,:firstname,:lastname,:email,:password)",nativeQuery=true)
 	@Modifying	
-	public Integer SaveUser(int id,String username,String firstname,String lastname,String email,String password);
+	public Integer SaveUser(String username,String firstname,String lastname,String email,String password);
 
 	@Query("from UserInfo where username=?1")
     UserInfo findByUsername(String username);

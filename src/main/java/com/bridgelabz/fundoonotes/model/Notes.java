@@ -25,26 +25,34 @@ public class Notes {
 	private String title;
     private String takeanote;
     @Column(columnDefinition="boolean default false")
-   private boolean isarchieve;
+    private boolean archieve;
+   
+
+	@Column(columnDefinition="boolean default false")
+    private boolean trashed;
     @Column(columnDefinition="boolean default false")
-   private boolean istrash;
-    @Column(columnDefinition="boolean default false")
-    private boolean ispinned;
-   private String reminder;
-   private String color;
-   @LastModifiedDate
-   private Date lastupdate;
-   @ManyToMany
-   private List<Label> label;
-   @OneToMany(mappedBy="notes")
-   private List<Images> images;
+    private boolean pinned;
+    private String reminder;
+    private String color;
+    @LastModifiedDate
+    private Date lastupdate;
+   
    @Column(columnDefinition="timestamp default current_timestamp")
    private Date CreatedTime;
-   @JsonIgnore
-   @OneToOne
-   private UserInfo userinfo;
    
-   private List<Collaborator> collaborators;
+   public Notes()
+   {}
+   
+public Notes(String title,String takeanote,boolean archieve,boolean trashed,boolean pinned,String reminder,String color)
+{
+	this.title=title;
+	this.takeanote=takeanote;
+	this.archieve=archieve;
+	this.trashed=trashed;
+	this.pinned=pinned;
+	this.reminder=reminder;
+	this.color=color;
+}
 
 public int getId() {
 	return id;
@@ -70,29 +78,7 @@ public void setTakeanote(String takeanote) {
 	this.takeanote = takeanote;
 }
 
-public boolean isIsarchieve() {
-	return isarchieve;
-}
 
-public void setIsarchieve(boolean isarchieve) {
-	this.isarchieve = isarchieve;
-}
-
-public boolean isIstrash() {
-	return istrash;
-}
-
-public void setIstrash(boolean istrash) {
-	this.istrash = istrash;
-}
-
-public boolean isIspinned() {
-	return ispinned;
-}
-
-public void setIspinned(boolean ispinned) {
-	this.ispinned = ispinned;
-}
 
 public String getReminder() {
 	return reminder;
@@ -117,21 +103,28 @@ public Date getLastupdate() {
 public void setLastupdate(Date lastupdate) {
 	this.lastupdate = lastupdate;
 }
-
-public List<Label> getLabel() {
-	return label;
+public boolean isArchieve() {
+	return archieve;
 }
 
-public void setLabel(List<Label> label) {
-	this.label = label;
+public void setArchieve(boolean archieve) {
+	this.archieve = archieve;
 }
 
-public List<Images> getImages() {
-	return images;
+public boolean isTrashed() {
+	return trashed;
 }
 
-public void setImages(List<Images> images) {
-	this.images = images;
+public void setTrashed(boolean trashed) {
+	this.trashed = trashed;
+}
+
+public boolean isPinned() {
+	return pinned;
+}
+
+public void setPinned(boolean pinned) {
+	this.pinned = pinned;
 }
 
 public Date getCreatedTime() {
@@ -142,22 +135,6 @@ public void setCreatedTime(Date createdTime) {
 	CreatedTime = createdTime;
 }
 
-public UserInfo getUserinfo() {
-	return userinfo;
-}
-
-public void setUserinfo(UserInfo userinfo) {
-	this.userinfo = userinfo;
-}
-
-public List<Collaborator> getCollaborators() {
-	return collaborators;
-}
-
-public void setCollaborators(List<Collaborator> collaborators) {
-	this.collaborators = collaborators;
-}
-   
    
 
 }

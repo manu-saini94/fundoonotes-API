@@ -47,19 +47,21 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	@Override
 	public boolean Register(UserDTO userdto) {
 		
+		boolean flag=false;
 		try {
 			
 			UserInfo user=modelMapper.map(userdto,UserInfo.class);
-			userRepository.SaveUser(user.getId(),user.getUsername(),user.getFirstname(),user.getLastname(),user.getEmail(),user.getPassword());
+			Integer I=userRepository.SaveUser(user.getUsername(),user.getFirstname(),user.getLastname(),user.getEmail(),user.getPassword());
+			flag=true;
 			MailDetails(user.getEmail());
-			return true;
+				
 		} 
 		catch(Exception e) {
 			
 			e.printStackTrace();
-			return false;
+			
 		}
-		
+		return flag;
 	}
 	
 	
@@ -138,7 +140,7 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	try {
 			
 			UserInfo user=modelMapper.map(forgotdto,UserInfo.class);
-			userRepository.SaveUser(user.getId(),user.getUsername(),user.getFirstname(),user.getLastname(),user.getEmail(),user.getPassword());
+			userRepository.SaveUser(user.getUsername(),user.getFirstname(),user.getLastname(),user.getEmail(),user.getPassword());
 			PassDetails(user.getEmail());
 			
 		} 

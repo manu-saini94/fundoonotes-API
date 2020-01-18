@@ -19,7 +19,7 @@ public class LoginConfiguration extends WebSecurityConfigurerAdapter {
 	
 	protected void configure(HttpSecurity http) throws Exception
 	{
-		http.csrf().disable().authorizeRequests().antMatchers("/*")
+		http.csrf().disable().authorizeRequests().antMatchers("/**")
 		.permitAll()
 		.anyRequest().authenticated()
 		.and().addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class)

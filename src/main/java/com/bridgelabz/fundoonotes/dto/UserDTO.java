@@ -1,7 +1,6 @@
 package com.bridgelabz.fundoonotes.dto;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 public class UserDTO {
@@ -13,7 +12,7 @@ public class UserDTO {
 	@NotNull(message=" Last name cannot be empty")
 	private String lastname;
 	@NotNull(message=" email cannot be empty")
-	@Pattern(regexp = "^[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]{2,4}$",message = "give a valid email")
+	//@Pattern(regexp = "^[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]{2,4}$",message = "give a valid email")
 	private String email;
 	@NotNull
 	private boolean isemailverified;

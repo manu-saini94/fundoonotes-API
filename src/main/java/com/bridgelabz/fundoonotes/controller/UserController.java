@@ -45,18 +45,20 @@ public class UserController {
 	@PostMapping("/register")
 	public ResponseEntity<Response> registration(@Valid @RequestBody UserDTO userdto,BindingResult bindingresult)
 	{
+		
+		System.out.println("Entered reg");
 		if(bindingresult.hasErrors() || !userdto.getPassword().equals(userdto.getPasswordagain()))
 		{
 			return ResponseEntity.badRequest().body(new Response(400,"Errors_found",utility.getErrors(bindingresult,userdto)));
 		}
 		else
-		{
+		
 		if(userService.Register(userdto))
 		return ResponseEntity.ok().body(new Response(200,"Registered Successfully",userdto));
 		else
 		return ResponseEntity.badRequest().body(new Response(400,"User already registered",userdto));
 			
-		}
+		
 	}
 	
 	@GetMapping("/verifyemail/{jwt}")
