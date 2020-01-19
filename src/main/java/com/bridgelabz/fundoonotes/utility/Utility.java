@@ -102,16 +102,18 @@ public class Utility {
 	        else
 	        return error;
 		}
-		
+	/*	
 		public boolean checkUser(String username)
 		{
+			System.out.println("5555");
 			return userRepository.findByUsername(username)!=null;
 		}
+		*/
 		
 		public boolean checkVerified(String username)
 		{
 			UserInfo user=userRepository.findByUsername(username);
-			return user.getIsEmailVerified();
+			return user.isEmailVerified();
 		}
 		
 		public boolean checkMail(String email)

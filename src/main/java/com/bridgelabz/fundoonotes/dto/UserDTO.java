@@ -15,7 +15,8 @@ public class UserDTO {
 	//@Pattern(regexp = "^[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]{2,4}$",message = "give a valid email")
 	private String email;
 	@NotNull
-	private boolean isemailverified;
+	private boolean emailverified;
+	
 	@NotNull(message="password cannot be empty")
 	@Size(min=8,max=20)
 	private String password;
@@ -47,12 +48,14 @@ public class UserDTO {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public boolean isIsemailverified() {
-		return isemailverified;
+	
+	public boolean isEmailverified() {
+		return emailverified;
 	}
-	public void setIsemailverified(boolean isemailverified) {
-		this.isemailverified = isemailverified;
+	public void setEmailverified(boolean emailverified) {
+		this.emailverified = emailverified;
 	}
+	
 	public String getPassword() {
 		return password;
 	}

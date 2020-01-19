@@ -18,7 +18,7 @@ public class LoginController {
 	@Autowired
 	LoginResponse loginResponse;
 	
-	@PostMapping("/login")
+	
 	public String login(@RequestBody LoginDTO logindto)
 	{
 		if(loginService.checkUser(logindto))

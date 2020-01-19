@@ -2,6 +2,8 @@ package com.bridgelabz.fundoonotes.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -25,8 +27,8 @@ public class NoteController {
 	@Autowired
 	Utility utility;
 	
-	@PostMapping("/new")
-	public ResponseEntity<Response> newNote(@RequestBody NoteDTO notedto,@RequestHeader("jwt") String jwt) throws JWTTokenException,UserException
+	@PostMapping("/create/{jwt}")
+	public ResponseEntity<Response> createNote(@RequestBody NoteDTO notedto,@PathVariable("jwt") String jwt) throws JWTTokenException,UserException
 	{
 		if(noteService.saveNewNoteImpl(notedto,jwt))
 		{
@@ -38,5 +40,19 @@ public class NoteController {
 		}
 		
 		
+	}
+	
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<Response> deleteNoteById(@PathVariable("id") int id,@RequestHeader("jwt") String jwt) throws JWTTokenException,UserException
+	{
+		if(noteService.deleteNote(id,jwt))
+		{
+			return ResponseEntity.ok().body(new Response(200,"Note Deleted",id));
+
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Deleting note",id));
+		}
 	}
 }

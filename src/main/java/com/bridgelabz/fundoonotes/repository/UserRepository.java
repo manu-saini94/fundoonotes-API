@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<UserInfo,Integer> {
 	@Modifying
 	public void changepassword(String password,String username);
 	
-	@Query(value="update user_info set isemailverified=true where username=:username",nativeQuery=true)
+	@Query(value="update user_info set is_email_verified=true where username=:username",nativeQuery=true)
 	@Modifying
 	public void setVerifiedEmail(String username);
 	

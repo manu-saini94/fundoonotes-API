@@ -25,20 +25,17 @@ public class UserInfo {
 	
 	@Column(columnDefinition="boolean default false")
     private boolean isEmailVerified;
-    
-	
-	
-    
-    public boolean getIsEmailVerified() {
-		return isEmailVerified;
-	}
-	public void setIsEmailVerified(boolean isEmailVerified) {
-		this.isEmailVerified = isEmailVerified;
-	}
+
 	@Column(columnDefinition="timestamp default current_timestamp")
 	private Date createddate;
 	
 	
+	public boolean isEmailVerified() {
+		return isEmailVerified;
+	}
+	public void setEmailVerified(boolean isEmailVerified) {
+		this.isEmailVerified = isEmailVerified;
+	}
 	public Date getCreateddate() {
 		return createddate;
 	}

@@ -36,7 +36,7 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		UserInfo user=utility.getUser(jwt);
 		if(user!=null)
 		{
-			Notes notes=new Notes(notedto.getTitle(),notedto.getTakeanote(),notedto.isArchieved(),notedto.isTrashed(),notedto.isPinned(),notedto.getReminder(),notedto.getColor());
+			Notes notes=new Notes(notedto.getTitle(),notedto.getTakeanote(),notedto.getReminder(),notedto.getColor());
 		    noteRepository.save(notes);
 		    return true;
 		}
@@ -44,6 +44,24 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		{
 			throw new UserException("No User for this Username");
 		}
+		
+	}
+	@Override
+	public boolean deleteNote(int id, String jwt) throws UserException {
+        UserInfo user=utility.getUser(jwt);
+        if(user!=null)
+        {
+        	if(noteRepository.deleteNoteById(id)!=0)
+        		return true;
+        	else
+        		return false;	
+        }
+        else
+        {
+			throw new UserException("No User for this Username");
+
+        }
+		
 		
 	}
 

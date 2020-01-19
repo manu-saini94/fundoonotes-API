@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	{
 		UserInfo user=userRepository.findByEmail(email);
 		String jwt=utility.generateToken(new User(user.getUsername(),user.getPassword(),new ArrayList<>()));
-		String url="http://localhost:8080/checkemail?jwt="+jwt;
+		String url="http://localhost:8080/user/verifyemail?jwt="+jwt;
 		utility.sendEMail(email,"verifying email",url);
 	}
 	
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService,UserDetailsService{
     {
     	UserInfo user=userRepository.findByEmail(email);
 		String jwt=utility.generateToken(new User(user.getUsername(),user.getPassword(),new ArrayList<>()));
-		String url="http://localhost:8080/checkemail?jwt="+jwt;
+		String url="http://localhost:8080/user/resetpassword?jwt="+jwt;
 		utility.sendEMail(email,"changing password",url);
     }
 	
@@ -88,13 +88,19 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	public ResponseEntity<Response> login(LoginDTO logindto) throws LoginException {
 		
 		UserInfo user=userRepository.findByUsername(logindto.getUsername());
-		if(!utility.checkUser(logindto.getUsername()))
+		if(user==null)
 		{
 			throw new LoginException("Register Before Login!");
 		}
-		if(utility.checkVerified(logindto.getUsername()))
+		boolean x=utility.checkVerified(logindto.getUsername());
+		System.out.println(x);
+		if(x)
 		{
-			if(logindto.getUsername().equals(user.getUsername()) && bcrypt.matches(logindto.getPassword(),user.getPassword()))
+			boolean a=logindto.getUsername().equals(user.getUsername());
+			System.out.println(a);
+			boolean b=logindto.getPassword().equals(user.getPassword());
+			System.out.println(b);
+			if(a && b)
 			{
 				String token=utility.generateToken(new User(logindto.getUsername(),logindto.getPassword(),new ArrayList<>()));
 				return  ResponseEntity.ok().body(new Response(200,"Token Received",token));
@@ -125,7 +131,7 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	public String resetPassword(String password, String jwt) throws JWTTokenException {
 		if(utility.validateToken(jwt))
 		{
-		userRepository.changepassword(bcrypt.encode(password),utility.getUsernameFromToken(jwt));
+		userRepository.changepassword(password,utility.getUsernameFromToken(jwt));
         return null;
 		}
 		else
@@ -140,7 +146,6 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	try {
 			
 			UserInfo user=modelMapper.map(forgotdto,UserInfo.class);
-			userRepository.SaveUser(user.getUsername(),user.getFirstname(),user.getLastname(),user.getEmail(),user.getPassword());
 			PassDetails(user.getEmail());
 			
 		} 

@@ -25,7 +25,7 @@ public class Notes {
 	private String title;
     private String takeanote;
     @Column(columnDefinition="boolean default false")
-    private boolean archieve;
+    private boolean archieved;
    
 
 	@Column(columnDefinition="boolean default false")
@@ -43,13 +43,10 @@ public class Notes {
    public Notes()
    {}
    
-public Notes(String title,String takeanote,boolean archieve,boolean trashed,boolean pinned,String reminder,String color)
+public Notes(String title,String takeanote,String reminder,String color)
 {
 	this.title=title;
 	this.takeanote=takeanote;
-	this.archieve=archieve;
-	this.trashed=trashed;
-	this.pinned=pinned;
 	this.reminder=reminder;
 	this.color=color;
 }
@@ -103,12 +100,12 @@ public Date getLastupdate() {
 public void setLastupdate(Date lastupdate) {
 	this.lastupdate = lastupdate;
 }
-public boolean isArchieve() {
-	return archieve;
+public boolean isArchieved() {
+	return archieved;
 }
 
-public void setArchieve(boolean archieve) {
-	this.archieve = archieve;
+public void setArchieved(boolean archieved) {
+	this.archieved = archieved;
 }
 
 public boolean isTrashed() {

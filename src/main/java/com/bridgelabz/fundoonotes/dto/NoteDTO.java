@@ -4,7 +4,6 @@ package com.bridgelabz.fundoonotes.dto;
 public class NoteDTO {
 
 	private String title;
-	
 	private String takeanote;
 	private boolean trashed;
 	private boolean archieved;
