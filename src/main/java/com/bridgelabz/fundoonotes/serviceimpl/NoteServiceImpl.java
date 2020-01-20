@@ -31,14 +31,22 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 	this.mapper=mapper;
 }
 	@Override
-	public boolean saveNewNoteImpl(NoteDTO notedto, String jwt) throws JWTTokenException, UserException {
+	public boolean saveNewNote(NoteDTO notedto, String jwt) throws JWTTokenException, UserException {
 	
 		UserInfo user=utility.getUser(jwt);
 		if(user!=null)
 		{
-			Notes notes=new Notes(notedto.getTitle(),notedto.getTakeanote(),notedto.getReminder(),notedto.getColor());
-		    noteRepository.save(notes);
-		    return true;
+			System.out.println(user);
+		
+		Notes notes= new Notes();
+		 notes.setTitle(notedto.getTitle());
+		 notes.setTakeanote(notedto.getTakeanote());
+		 notes.setColor(notedto.getColor());
+		 notes.setUserdetails(user);
+		   noteRepository.save(notes);
+		
+	    return true;
+			
 		}
 		else
 		{

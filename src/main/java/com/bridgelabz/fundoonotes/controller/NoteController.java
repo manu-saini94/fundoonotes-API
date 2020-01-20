@@ -30,7 +30,7 @@ public class NoteController {
 	@PostMapping("/create/{jwt}")
 	public ResponseEntity<Response> createNote(@RequestBody NoteDTO notedto,@PathVariable("jwt") String jwt) throws JWTTokenException,UserException
 	{
-		if(noteService.saveNewNoteImpl(notedto,jwt))
+		if(noteService.saveNewNote(notedto,jwt))
 		{
 			return ResponseEntity.ok().body(new Response(200,"Note Created",notedto));
 		}

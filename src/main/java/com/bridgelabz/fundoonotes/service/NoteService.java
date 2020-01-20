@@ -8,7 +8,7 @@ import com.bridgelabz.fundoonotes.dto.NoteDTO;
 
 public interface NoteService {
 
-	public boolean saveNewNoteImpl(NoteDTO notedto,String jwt) throws JWTTokenException, UserException;
+	public boolean saveNewNote(NoteDTO notedto,String jwt) throws JWTTokenException, UserException;
     public boolean deleteNote(int id,String jwt) throws UserException;
     
 

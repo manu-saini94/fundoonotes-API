@@ -1,16 +1,21 @@
 package com.bridgelabz.fundoonotes.model;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
-public class UserInfo {
+public class UserInfo implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -29,6 +34,27 @@ public class UserInfo {
 	@Column(columnDefinition="timestamp default current_timestamp")
 	private Date createddate;
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "userdetails")
+	private List<Notes> notes;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "userdetails")
+	private List<Labels> labels;
+	
+
+	public List<Labels> getLabels() {
+		return labels;
+	}
+	public void setLabels(List<Labels> labels) {
+		this.labels = labels;
+	}
+	public List<Notes> getNotes() {
+		return notes;
+	}
+	public void setNotes(List<Notes> notes) {
+		this.notes = notes;
+	}
 	
 	public boolean isEmailVerified() {
 		return isEmailVerified;
