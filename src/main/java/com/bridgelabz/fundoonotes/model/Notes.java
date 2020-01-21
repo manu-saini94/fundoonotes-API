@@ -49,6 +49,14 @@ public class Notes {
    @ManyToMany
    private List<Labels> labels;
    
+   @OneToMany(mappedBy = "notes")
+   private List<Images> images;
+   
+   @OneToMany(mappedBy="notes")
+   private List<Collaborator> collaborator;
+   
+
+
 
 public Notes() {
 	super();
@@ -63,6 +71,34 @@ public Notes(String title, String takeanote, String color, UserInfo userdetails)
 	this.userdetails = userdetails;
 }
 
+
+public List<Labels> getLabels() {
+	return labels;
+}
+
+public void setLabels(List<Labels> labels) {
+	this.labels = labels;
+}
+
+
+public List<Images> getImages() {
+	return images;
+}
+
+
+public void setImages(List<Images> images) {
+	this.images = images;
+}
+
+
+public List<Collaborator> getCollaborator() {
+	return collaborator;
+}
+
+
+public void setCollaborator(List<Collaborator> collaborator) {
+	this.collaborator = collaborator;
+}
 
 public int getId() {
 	return id;
