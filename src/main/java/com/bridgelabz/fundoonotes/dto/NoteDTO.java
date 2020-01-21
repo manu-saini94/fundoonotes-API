@@ -1,5 +1,6 @@
 package com.bridgelabz.fundoonotes.dto;
 
+import java.util.List;
 
 public class NoteDTO {
 
@@ -10,8 +11,21 @@ public class NoteDTO {
 	private boolean pinned;
 	private String color;
 	private String reminder;
+	private List<String> label;
+	private List<String> images;
 	
-	
+	public List<String> getLabel() {
+		return label;
+	}
+	public void setLabel(List<String> label) {
+		this.label = label;
+	}
+	public List<String> getImages() {
+		return images;
+	}
+	public void setImages(List<String> images) {
+		this.images = images;
+	}
 	public String getTitle() {
 		return title;
 	}
