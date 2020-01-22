@@ -2,14 +2,19 @@ package com.bridgelabz.fundoonotes.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundoonotes.Exceptions.LabelExistException;
+import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
 import com.bridgelabz.fundoonotes.dto.LabelDTO;
+import com.bridgelabz.fundoonotes.dto.NoteDTO;
 import com.bridgelabz.fundoonotes.response.Response;
 import com.bridgelabz.fundoonotes.service.LabelService;
 
@@ -20,7 +25,7 @@ public class LabelController {
 	@Autowired
 	private LabelService labelService;
 	
-	@PostMapping("/create")
+	@PostMapping("edit/create")
 	public ResponseEntity<Response> createLabel(@RequestBody LabelDTO labeldto,@RequestHeader String jwt) throws LabelExistException
 	{
 		String result=labelService.saveNewLabel(labeldto, jwt);
@@ -41,4 +46,35 @@ public class LabelController {
 		else
 			return ResponseEntity.badRequest().body(new Response(400,"Some Problem has occured",labeldto));
 	}
+	
+	@DeleteMapping("edit/delete/{jwt}")
+	public ResponseEntity<Response> deleteLabelForUser(@RequestHeader("id") int id,@PathVariable("jwt") String jwt) throws LabelNotFoundException
+	{
+		if(labelService.deleteLabelByUser(id,jwt))
+		{
+			return ResponseEntity.ok().body(new Response(200,"Label Deleted For User",id));
+
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"Some Problem has occured",id));
+
+		}
+		
+	}
+	
+	@PutMapping("edit/rename/{id}")
+	public ResponseEntity<Response> editLabelForUser(@RequestBody LabelDTO labeldto,@PathVariable("id") int id,@RequestHeader("jwt") String jwt) throws LabelNotFoundException
+	{
+		if(labelService.renameLabelForUser(labeldto.getLabelname(),id,jwt))
+		{
+				return ResponseEntity.ok().body(new Response(200,"Label name For User edited",id));
+		}
+		else
+		{
+		     	return ResponseEntity.badRequest().body(new Response(400,"Some Problem has occured",id));
+	
+		}
+		}
+	
 }

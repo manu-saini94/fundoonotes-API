@@ -11,20 +11,14 @@ public class NoteDTO {
 	private boolean pinned;
 	private String color;
 	private String reminder;
-	private List<String> label;
-	private List<String> images;
-	
-	public List<String> getLabel() {
-		return label;
+	private String labelname;
+
+
+	public String getLabelname() {
+		return labelname;
 	}
-	public void setLabel(List<String> label) {
-		this.label = label;
-	}
-	public List<String> getImages() {
-		return images;
-	}
-	public void setImages(List<String> images) {
-		this.images = images;
+	public void setLabelname(String labelname) {
+		this.labelname = labelname;
 	}
 	public String getTitle() {
 		return title;

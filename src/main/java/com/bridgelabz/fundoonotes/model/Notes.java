@@ -49,8 +49,7 @@ public class Notes {
    @ManyToMany
    private List<Labels> labels;
    
-   @OneToMany(mappedBy = "notes")
-   private List<Images> images;
+   
    
    @OneToMany(mappedBy="notes")
    private List<Collaborator> collaborator;
@@ -79,17 +78,6 @@ public List<Labels> getLabels() {
 public void setLabels(List<Labels> labels) {
 	this.labels = labels;
 }
-
-
-public List<Images> getImages() {
-	return images;
-}
-
-
-public void setImages(List<Images> images) {
-	this.images = images;
-}
-
 
 public List<Collaborator> getCollaborator() {
 	return collaborator;

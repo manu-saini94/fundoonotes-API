@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.fundoonotes.Exceptions.LabelExistException;
+import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
 import com.bridgelabz.fundoonotes.dto.LabelDTO;
 import com.bridgelabz.fundoonotes.model.Labels;
 import com.bridgelabz.fundoonotes.model.UserInfo;
@@ -33,14 +34,49 @@ public class LabelServiceImpl implements LabelService{
 	else
     if(labelRepository.getLabelByName(labeldto.getLabelname())==null)
     {
-		Labels label=new Labels(labeldto.getId(), labeldto.getLabelname(), user);
+		Labels label=new Labels(labeldto.getLabelname(), user);
 		labelRepository.save(label);
 	    return "success";
     }
     else
    	return "existed";
     
+	}
 
+
+
+
+	@Override
+	public boolean deleteLabelByUser(int id, String jwt) throws LabelNotFoundException {
+	if(utility.validateToken(jwt))
+	{
+	   	int i=labelRepository.deleteLabelInUser(id);
+	   	if(i!=0)
+	   	return true;
+	   	else
+	  	return false;
+	}
+	else
+		throw new LabelNotFoundException("Label Not Found Exception");
+	}
+
+
+
+
+	@Override
+	public boolean renameLabelForUser(String labelname, int id, String jwt) throws LabelNotFoundException {
+	if(utility.validateToken(jwt))
+	{
+		int i=labelRepository.renameLabel(labelname,id);
+		if(i!=0)
+		return true;
+		else
+		return false;
+	  }
+	else
+		throw new LabelNotFoundException("Label Not Found Exception");
+	
+	
 	}
 
 }

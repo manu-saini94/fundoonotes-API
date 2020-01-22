@@ -5,12 +5,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundoonotes.Exceptions.JWTTokenException;
+import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.UserException;
 import com.bridgelabz.fundoonotes.dto.NoteDTO;
 import com.bridgelabz.fundoonotes.response.Response;
@@ -55,4 +57,38 @@ public class NoteController {
 			return ResponseEntity.badRequest().body(new Response(400,"problem in Deleting note",id));
 		}
 	}
+	
+	@PutMapping("/update/label/{id}")
+	public ResponseEntity<Response> updateNoteById(@PathVariable("id") int id,@RequestBody NoteDTO updatedto,@RequestHeader("jwt") String jwt) throws JWTTokenException
+	{
+	   boolean b=noteService.updateLabelInNote(updatedto,jwt,id);
+	   if(b==true)
+	   {
+		   return ResponseEntity.ok().body(new Response(200,"Label created inside note",id));
+	   }
+	   else
+	   {
+		   return ResponseEntity.badRequest().body(new Response(400,"problem in creating label",id));
+	   }
+		
+		
+	}
+	
+	@DeleteMapping("/delete/label/{id}")
+	public ResponseEntity<Response> deleteLabelFromNote(@PathVariable("id") int id,@RequestHeader("id1") int id1,@RequestHeader("jwt") String jwt) throws LabelNotFoundException
+	{
+		boolean b=noteService.deleteLabelInsideNote(id,id1,jwt);
+		if(b==true)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Label deleted inside note",id1));
+		}
+		else
+		{
+			   return ResponseEntity.badRequest().body(new Response(400,"problem in deleting label",id));
+
+		}
+		
+	}
+	
+	
 }

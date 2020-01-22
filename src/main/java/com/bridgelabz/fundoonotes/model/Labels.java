@@ -35,9 +35,8 @@ public class Labels {
 		super();
 	}
 
-	public Labels(int id, String labelname, UserInfo userdetails) {
+	public Labels(String labelname, UserInfo userdetails) {
 		super();
-		this.id = id;
 		this.labelname = labelname;
 		this.userdetails = userdetails;
 	}
