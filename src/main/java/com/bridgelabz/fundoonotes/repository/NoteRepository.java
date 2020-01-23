@@ -19,9 +19,9 @@ public interface NoteRepository extends JpaRepository<Notes,Integer> {
 	@Modifying
 	public Integer saveNote(Notes note); 
 	
-	@Query(value="update notes set trashed=true where id=?1",nativeQuery=true)
+	@Query(value="update notes set trashed=true where id=?1 and userdetails_id=?2",nativeQuery=true)
 	@Modifying	
-	public Integer deleteNoteById(int id);
+	public Integer deleteNoteById(int id1,int id2);
 	
 	@Query("from Labels where labelname=?1")
 	Labels getLabelByName(String labelname);
@@ -33,6 +33,18 @@ public interface NoteRepository extends JpaRepository<Notes,Integer> {
 	@Query(value="delete from notes_labels where notes_id=?1 and labels_id=?2",nativeQuery=true)
 	@Modifying
 	public void deleteLabelInNote(int id, int id1);
+
+	@Query(value="from Notes where id=?1")
+	public Notes findNoteById(int id);
+	
+	@Query(value="update notes set pinned=?1 where userdetails_id=?2 and id=?3",nativeQuery=true)
+	@Modifying
+	public Integer setPinning(boolean b,int id1,int id2);
+	
+	@Query(value="update notes set archieved=?1 where userdetails_id=?2 and id=?3",nativeQuery=true)
+	@Modifying
+	public Integer setArchieving(boolean b,int id1,int id2);
+	
 
 	
 }

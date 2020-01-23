@@ -3,6 +3,7 @@ package com.bridgelabz.fundoonotes.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundoonotes.Exceptions.JWTTokenException;
 import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
+import com.bridgelabz.fundoonotes.Exceptions.NoteNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.UserException;
 import com.bridgelabz.fundoonotes.dto.NoteDTO;
 import com.bridgelabz.fundoonotes.response.Response;
@@ -44,6 +46,12 @@ public class NoteController {
 		
 	}
 	
+	@GetMapping("/displayAll/{jwt}")
+	public ResponseEntity<Response> displayAllNotesForUser(@PathVariable("jwt") String jwt)
+	{
+		return null;
+		
+	}
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<Response> deleteNoteById(@PathVariable("id") int id,@RequestHeader("jwt") String jwt) throws JWTTokenException,UserException
 	{
@@ -90,5 +98,18 @@ public class NoteController {
 		
 	}
 	
-	
+	@PutMapping("/update/pin/{id}")
+	public ResponseEntity<Response> updateNoteWithPin(@PathVariable("id") int id,@RequestHeader("jwt") String jwt) throws NoteNotFoundException, JWTTokenException
+	{
+	 boolean b=noteService.updatePinForNote(id,jwt);
+	 if(b==true)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Note pin updated",id));
+		}
+		else
+		{
+			   return ResponseEntity.badRequest().body(new Response(400,"problem in updating pin",id));
+
+		}		
+	}
 }

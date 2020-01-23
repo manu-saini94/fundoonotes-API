@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.bridgelabz.fundoonotes.Exceptions.JWTTokenException;
 import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
+import com.bridgelabz.fundoonotes.Exceptions.NoteNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.UserException;
 import com.bridgelabz.fundoonotes.dto.NoteDTO;
 import com.bridgelabz.fundoonotes.model.Labels;
@@ -63,11 +64,11 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		
 	}
 	@Override
-	public boolean deleteNote(int id, String jwt) throws UserException {
+	public boolean deleteNote(int id1, String jwt) throws UserException {
         UserInfo user=utility.getUser(jwt);
         if(user!=null)
         {
-        	if(noteRepository.deleteNoteById(id)!=0)
+        	if(noteRepository.deleteNoteById(id1,user.getId())!=0)
         		return true;
         	else
         		return false;	
@@ -121,6 +122,57 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		}
 		else
 	    throw new LabelNotFoundException("Label not found");
+	}
+	
+	@Override
+	public boolean updatePinForNote(int id, String jwt) throws NoteNotFoundException, JWTTokenException {
+		UserInfo user=null;
+		boolean flag=false;
+		if(utility.validateToken(jwt))
+		{
+			user=utility.getUser(jwt);
+			Notes note=noteRepository.findNoteById(id);
+			if(note!=null)
+			{
+              if(!note.isPinned() && note.isArchieved())
+              {
+            	 int i=noteRepository.setPinning(true,user.getId(),id);
+            	 int j=noteRepository.setArchieving(false,user.getId(),id);
+            	 if(i!=0 && j!=0)
+            		 flag=true;
+            	 else
+            		 flag=false;
+              }
+              else
+            	  if(!note.isPinned() && !note.isArchieved())
+              {
+                 	 int i=noteRepository.setPinning(true,user.getId(),id);       
+              if(i!=0)
+            	  flag=true;
+              else
+            	  flag=false;
+              }
+            	else
+            	 if(note.isPinned())
+            	 {
+                    int i=noteRepository.setPinning(false,user.getId(),id);
+                if(i!=0)
+        	    flag=true;
+                else
+        	    flag=false;
+            	 }
+              return flag;
+			}
+			else
+			{
+			throw new NoteNotFoundException("Note Not Found Exception");
+			}
+			
+		}
+		else
+		{
+	    	throw new JWTTokenException("Token Not Found Exception");	
+		}
 	}
 	
 

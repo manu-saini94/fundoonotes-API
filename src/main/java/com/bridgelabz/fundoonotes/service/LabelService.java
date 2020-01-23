@@ -1,6 +1,7 @@
 package com.bridgelabz.fundoonotes.service;
 
 import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
+import com.bridgelabz.fundoonotes.Exceptions.NoteNotFoundException;
 import com.bridgelabz.fundoonotes.dto.LabelDTO;
 
 public interface LabelService {
@@ -10,6 +11,8 @@ public interface LabelService {
 	public boolean deleteLabelByUser(int id, String jwt) throws LabelNotFoundException;
 
 	public boolean renameLabelForUser(String labelname, int id, String jwt) throws LabelNotFoundException;
+	
+	public boolean displayNoteForLabel(int id,String jwt) throws NoteNotFoundException;
 	
 	
 	

@@ -3,6 +3,7 @@ package com.bridgelabz.fundoonotes.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundoonotes.Exceptions.LabelExistException;
 import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
+import com.bridgelabz.fundoonotes.Exceptions.NoteNotFoundException;
 import com.bridgelabz.fundoonotes.dto.LabelDTO;
 import com.bridgelabz.fundoonotes.dto.NoteDTO;
 import com.bridgelabz.fundoonotes.response.Response;
@@ -77,4 +79,16 @@ public class LabelController {
 		}
 		}
 	
+	@GetMapping("display/note/{id}")
+	public ResponseEntity<Response> displayNotesByLabel(@PathVariable("id") int id,@RequestHeader("jwt") String jwt) throws NoteNotFoundException
+	{
+		if(labelService.displayNoteForLabel(id,jwt))
+		{
+			return ResponseEntity.ok().body(new Response(200,"Note For Label displayed",id));
+
+		}
+		else	
+	     return ResponseEntity.badRequest().body(new Response(400,"Some Problem has occured",id));
+		
+	}
 }

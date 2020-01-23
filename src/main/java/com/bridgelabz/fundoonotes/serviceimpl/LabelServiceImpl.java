@@ -1,13 +1,17 @@
 package com.bridgelabz.fundoonotes.serviceimpl;
 
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.fundoonotes.Exceptions.LabelExistException;
 import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
+import com.bridgelabz.fundoonotes.Exceptions.NoteNotFoundException;
 import com.bridgelabz.fundoonotes.dto.LabelDTO;
 import com.bridgelabz.fundoonotes.model.Labels;
+import com.bridgelabz.fundoonotes.model.Notes;
 import com.bridgelabz.fundoonotes.model.UserInfo;
 import com.bridgelabz.fundoonotes.repository.LabelRepository;
 import com.bridgelabz.fundoonotes.repository.NoteRepository;
@@ -45,7 +49,6 @@ public class LabelServiceImpl implements LabelService{
 
 
 
-
 	@Override
 	public boolean deleteLabelByUser(int id, String jwt) throws LabelNotFoundException {
 	if(utility.validateToken(jwt))
@@ -77,6 +80,26 @@ public class LabelServiceImpl implements LabelService{
 		throw new LabelNotFoundException("Label Not Found Exception");
 	
 	
+	}
+
+
+
+
+	@Override
+	public boolean displayNoteForLabel(int id, String jwt) throws NoteNotFoundException {
+		if(utility.validateToken(jwt))
+		{
+			 
+			Object[] notes=labelRepository.displayNotes(id);
+			System.out.println(notes);
+			if(notes!=null)
+			return true;
+			else
+			return false;
+		  }
+		else
+			throw new NoteNotFoundException("Note Not Found for Label Exception");
+		
 	}
 
 }

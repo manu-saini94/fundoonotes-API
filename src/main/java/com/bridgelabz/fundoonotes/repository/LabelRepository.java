@@ -1,5 +1,7 @@
 package com.bridgelabz.fundoonotes.repository;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.bridgelabz.fundoonotes.model.Labels;
+import com.bridgelabz.fundoonotes.model.Notes;
 import com.bridgelabz.fundoonotes.model.UserInfo;
 
 @Repository
@@ -25,8 +28,8 @@ public interface LabelRepository extends JpaRepository<Labels,String> {
 	@Modifying
 	public Integer renameLabel(String labelname, int id);
 	
-	
-	
+	@Query(value=" select * from notes where id in (select notes_id from notes_labels where labels_id=:labelID)",nativeQuery = true)
+	public Object[] displayNotes(int labelID);
 	
 	
 
