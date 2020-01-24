@@ -17,7 +17,7 @@ import com.bridgelabz.fundoonotes.model.UserInfo;
 @Transactional
 public interface LabelRepository extends JpaRepository<Labels,String> {
 
-	@Query("from Labels where labelname=?1 and userdetails_id=?2")
+	@Query("from Labels where labelname=?1 and userdetails=?2")
 	Labels getLabelByName(String labelname,int id);
 	
 	@Query("delete from Labels where id=?1 and userdetails_id=?2")
@@ -30,6 +30,14 @@ public interface LabelRepository extends JpaRepository<Labels,String> {
 	
 	@Query(value=" select * from notes where id in (select notes_id from notes_labels where labels_id=:labelID)",nativeQuery = true)
 	public Object[] displayNotes(int labelID);
+
+	@Query("from Labels where id=?1 and userdetails=?2")
+	Labels getLabelByUser(int id1, int id2);
+
+	@Query(value="select labelname from labels where userdetails_id=?1",nativeQuery=true)
+	List<String> getLabelNamesByUser(int id);
+	
+	
 	
 	
 

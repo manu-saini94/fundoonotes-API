@@ -1,5 +1,7 @@
 package com.bridgelabz.fundoonotes.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bridgelabz.fundoonotes.Exceptions.JWTTokenException;
 import com.bridgelabz.fundoonotes.Exceptions.LabelExistException;
 import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.NoteNotFoundException;
@@ -89,6 +92,22 @@ public class LabelController {
 		}
 		else	
 	     return ResponseEntity.badRequest().body(new Response(400,"Some Problem has occured",id));
+		
+	}
+	
+	
+	@GetMapping("displaylabels/{jwt}")
+	public ResponseEntity<Response> displayAllLabelsForUser(@PathVariable("jwt") String jwt) throws LabelNotFoundException, JWTTokenException
+	{
+		List<String> list=labelService.displayAllLabels(jwt);
+		
+		if(list!=null)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Labels for User displayed",list));
+
+		}
+		else	
+	     return ResponseEntity.badRequest().body(new Response(400,"Some Problem has occured",list));
 		
 	}
 }

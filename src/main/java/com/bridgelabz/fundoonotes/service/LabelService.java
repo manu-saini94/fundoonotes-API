@@ -1,5 +1,8 @@
 package com.bridgelabz.fundoonotes.service;
 
+import java.util.List;
+
+import com.bridgelabz.fundoonotes.Exceptions.JWTTokenException;
 import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.NoteNotFoundException;
 import com.bridgelabz.fundoonotes.dto.LabelDTO;
@@ -13,6 +16,10 @@ public interface LabelService {
 	public boolean renameLabelForUser(String labelname, int id, String jwt) throws LabelNotFoundException;
 	
 	public boolean displayNoteForLabel(int id,String jwt) throws NoteNotFoundException;
+
+
+	public List<String> displayAllLabels(String jwt) throws LabelNotFoundException, JWTTokenException;
+	
 	
 	
 	

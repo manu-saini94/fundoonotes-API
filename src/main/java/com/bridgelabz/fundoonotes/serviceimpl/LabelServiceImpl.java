@@ -6,6 +6,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bridgelabz.fundoonotes.Exceptions.JWTTokenException;
 import com.bridgelabz.fundoonotes.Exceptions.LabelExistException;
 import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.NoteNotFoundException;
@@ -85,14 +86,13 @@ public class LabelServiceImpl implements LabelService{
 	}
 
 
-
-
 	@Override
 	public boolean displayNoteForLabel(int id, String jwt) throws NoteNotFoundException {
+		UserInfo user=utility.getUser(jwt);
 		if(utility.validateToken(jwt))
 		{
-			 
-			Object[] notes=labelRepository.displayNotes(id);
+			Labels label=labelRepository.getLabelByUser(id,user.getId()); 
+			Object[] notes=labelRepository.displayNotes(label.getId());
 			System.out.println(notes);
 			if(notes!=null)
 			return true;
@@ -104,4 +104,25 @@ public class LabelServiceImpl implements LabelService{
 		
 	}
 
+
+
+	@Override
+	public List<String> displayAllLabels(String jwt) throws LabelNotFoundException, JWTTokenException {
+		UserInfo user=utility.getUser(jwt);
+		if(utility.validateToken(jwt))
+		{
+		 List<String> list=labelRepository.getLabelNamesByUser(user.getId()); 
+		 if(list!=null)
+			 return list;
+		 else
+			 throw new LabelNotFoundException("Labels not found for user");
+	}
+		else
+			throw new JWTTokenException("Token is not valid");
+
+	}
+
+
+	
+	
 }
