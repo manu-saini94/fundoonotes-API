@@ -99,7 +99,7 @@ public class NoteController {
 	}
 	
 	@PutMapping("/update/label/{id}")
-	public ResponseEntity<Response> updateNoteById(@PathVariable("id") int id,@RequestBody NoteDTO updatedto,@RequestHeader("jwt") String jwt) throws JWTTokenException
+	public ResponseEntity<Response> updateNoteById(@PathVariable("id") int id,@RequestBody NoteDTO updatedto,@RequestHeader("jwt") String jwt) throws JWTTokenException, NoteNotFoundException
 	{
 	   boolean b=noteService.updateLabelInNote(updatedto,jwt,id);
 	   if(b==true)
@@ -115,7 +115,7 @@ public class NoteController {
 	}
 	
 	@DeleteMapping("/delete/label/{id}")
-	public ResponseEntity<Response> deleteLabelFromNote(@PathVariable("id") int id,@RequestHeader("id1") int id1,@RequestHeader("jwt") String jwt) throws LabelNotFoundException
+	public ResponseEntity<Response> deleteLabelFromNote(@PathVariable("id") int id,@RequestHeader("id1") int id1,@RequestHeader("jwt") String jwt) throws LabelNotFoundException, JWTTokenException, NoteNotFoundException
 	{
 		boolean b=noteService.deleteLabelInsideNote(id,id1,jwt);
 		if(b==true)
