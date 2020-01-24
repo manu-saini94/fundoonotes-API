@@ -50,7 +50,6 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		Notes notes= new Notes();
 		 notes.setTitle(notedto.getTitle());
 		 notes.setTakeanote(notedto.getTakeanote());
-		 notes.setColor(notedto.getColor());
 		 notes.setUserdetails(user);
 		   noteRepository.save(notes);
 		
@@ -82,30 +81,32 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 	}
 	
 	@Override
-	public boolean updateLabelInNote(NoteDTO updatedto, String jwt,int id) throws JWTTokenException {
-		if(utility.validateToken(jwt))
+	public boolean updateLabelInNote(NoteDTO updatedto, String jwt,int id) throws JWTTokenException, NoteNotFoundException {
+	if(utility.validateToken(jwt))
+	{
+		UserInfo user=utility.getUser(jwt);
+		Labels label=noteRepository.getLabelByName(updatedto.getLabelname(),user.getId());
+		Notes note=noteRepository.getNoteByNoteId(id,user.getId());
+		if(label==null && note!=null)
 		{
-			UserInfo user=utility.getUser(jwt);
-			if(noteRepository.getLabelByName(updatedto.getLabelname())==null)
+			Labels labels=new Labels(updatedto.getLabelname(),user);
+		    labelRepository.save(labels);
+			Labels labels1=labelRepository.getLabelByName(updatedto.getLabelname(),user.getId());
+			noteRepository.saveLabelInNote(id,labels1.getId());
+				
+				return true;
+		 }
+			else
+				if(label!=null && note!=null)
 			{
-				Labels labels=new Labels(updatedto.getLabelname(),user);
-				labelRepository.save(labels);
-				Labels labels1=labelRepository.getLabelByName(updatedto.getLabelname());
+				Labels labels1=labelRepository.getLabelByName(updatedto.getLabelname(),user.getId());
 				noteRepository.saveLabelInNote(id,labels1.getId());
 				return true;
 			}
-			else
-				if(noteRepository.getLabelByName(updatedto.getLabelname())!=null)
-			{
-				Labels labels1=labelRepository.getLabelByName(updatedto.getLabelname());
-				noteRepository.saveLabelInNote(id,labels1.getId());
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+				
 			
+			else
+				throw new NoteNotFoundException("Note Not Found for user");
 		}
 		else
 		throw new JWTTokenException("Problem with your token");
@@ -113,16 +114,29 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		
 	}
 	
+	
+	
+	
 	@Override
-	public boolean deleteLabelInsideNote(int id, int id1, String jwt) throws LabelNotFoundException {
+	public boolean deleteLabelInsideNote(int id, int id1, String jwt) throws JWTTokenException, NoteNotFoundException {
+		UserInfo user=utility.getUser(jwt);
 		if(utility.validateToken(jwt))
 		{
-		noteRepository.deleteLabelInNote(id,id1);
+		Notes note=noteRepository.getNoteByNoteId(id,user.getId());
+		if(note!=null)
+		{
+		noteRepository.deleteLabelInNote(note.getId(),id1);
 		return true;
 		}
 		else
-	    throw new LabelNotFoundException("Label not found");
+			throw new NoteNotFoundException("Note For user Not Found");
+		}
+		else
+	    throw new JWTTokenException("Token not Found Exception");
 	}
+	
+	
+	
 	
 	@Override
 	public boolean updatePinForNote(int id, String jwt) throws NoteNotFoundException, JWTTokenException {
@@ -173,6 +187,91 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		{
 	    	throw new JWTTokenException("Token Not Found Exception");	
 		}
+	}
+	
+	@Override
+	public boolean updateArchieveForNote(int id, String jwt) throws NoteNotFoundException, JWTTokenException {
+		UserInfo user=null;
+		boolean flag=false;
+		if(utility.validateToken(jwt))
+		{
+			user=utility.getUser(jwt);
+			Notes note=noteRepository.findNoteById(id);
+			if(note!=null)
+			{
+              if(!note.isArchieved() &&  note.isPinned())
+              {
+             	 int i=noteRepository.setArchieving(true,user.getId(),id);
+            	 int j=noteRepository.setPinning(false,user.getId(),id);
+            	 if(i!=0 && j!=0)
+            		 flag=true;
+            	 else
+            		 flag=false;
+              }
+              else
+            	  if(!note.isPinned() && !note.isArchieved())
+              {
+                  	 int i=noteRepository.setArchieving(true,user.getId(),id);
+              if(i!=0)
+            	  flag=true;
+              else
+            	  flag=false;
+              }
+            	else
+            	 if(note.isArchieved())
+            	 {
+                    int i=noteRepository.setArchieving(false,user.getId(),id);
+                if(i!=0)
+        	    flag=true;
+                else
+        	    flag=false;
+            	 }
+              return flag;
+			}
+			else
+			{
+			throw new NoteNotFoundException("Note Not Found Exception");
+			}
+			
+		}
+		else
+		{
+	    	throw new JWTTokenException("Token Not Found Exception");	
+		}
+		
+
+		
+		
+	}
+	@Override
+	public List<Notes> displayAllNotesByUser(String jwt) throws JWTTokenException {
+		UserInfo user=null;
+		boolean flag=false;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		List<Notes> notes=noteRepository.getNotesByUser(user.getId());
+		return notes;
+		}
+		else
+		throw new JWTTokenException("Token Not Found Exception");	
+		
+	}
+	
+	
+	@Override
+	public List<Notes> displayPinnedNotesByUser(String jwt) throws JWTTokenException {
+		UserInfo user=null;
+		boolean flag=false;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		List<Notes> notes=noteRepository.getPinnedNotesByUser(user.getId());
+		return notes;
+		}
+		else
+		throw new JWTTokenException("Token Not Found Exception");	
+		
 	}
 	
 

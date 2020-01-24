@@ -17,16 +17,16 @@ import com.bridgelabz.fundoonotes.model.UserInfo;
 @Transactional
 public interface LabelRepository extends JpaRepository<Labels,String> {
 
-	@Query("from Labels where labelname=?1")
-	Labels getLabelByName(String labelname);
+	@Query("from Labels where labelname=?1 and userdetails_id=?2")
+	Labels getLabelByName(String labelname,int id);
 	
-	@Query("delete from Labels where id=?1")
+	@Query("delete from Labels where id=?1 and userdetails_id=?2")
 	@Modifying 
-	public Integer deleteLabelInUser(int id);
+	public Integer deleteLabelInUser(int id1, int id2);
 
-	@Query("update Labels set labelname=?1 where id=?2")
+	@Query("update Labels set labelname=?1 where id=?2 and userdetails_id=?3")
 	@Modifying
-	public Integer renameLabel(String labelname, int id);
+	public Integer renameLabel(String labelname, int id1, int id2);
 	
 	@Query(value=" select * from notes where id in (select notes_id from notes_labels where labels_id=:labelID)",nativeQuery = true)
 	public Object[] displayNotes(int labelID);

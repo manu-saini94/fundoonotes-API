@@ -25,8 +25,8 @@ public interface NoteRepository extends JpaRepository<Notes,Integer> {
 	@Modifying	
 	public Integer deleteNoteById(int id1,int id2);
 	
-	@Query("from Labels where labelname=?1")
-	Labels getLabelByName(String labelname);
+	@Query("from Labels where labelname=?1 and userdetails_id=?2")
+	Labels getLabelByName(String labelname,int id);
 	
 	@Query(value="insert into notes_labels(notes_id,labels_id) values(:id1,:id2)",nativeQuery=true) 
 	@Modifying
@@ -52,6 +52,14 @@ public interface NoteRepository extends JpaRepository<Notes,Integer> {
 
 	@Query(value="select * from notes where userdetails_id=?1 and pinned=1",nativeQuery=true)
 	public List<Notes> getPinnedNotesByUser(int id);
+
+	@Query(value="select * from notes where id=?1 and userdetails_id=?2",nativeQuery=true)
+	public Notes getNoteByNoteId(int id, int id2);
+	
+
+	
+
+	
 	
 	
 	

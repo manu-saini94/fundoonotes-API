@@ -36,7 +36,7 @@ public class LabelServiceImpl implements LabelService{
 	if(user==null)
 	return "Invalid User";
 	else
-    if(labelRepository.getLabelByName(labeldto.getLabelname())==null)
+    if(labelRepository.getLabelByName(labeldto.getLabelname(),user.getId())==null)
     {
 		Labels label=new Labels(labeldto.getLabelname(), user);
 		labelRepository.save(label);
@@ -51,9 +51,10 @@ public class LabelServiceImpl implements LabelService{
 
 	@Override
 	public boolean deleteLabelByUser(int id, String jwt) throws LabelNotFoundException {
+	UserInfo user=utility.getUser(jwt);
 	if(utility.validateToken(jwt))
 	{
-	   	int i=labelRepository.deleteLabelInUser(id);
+	   	int i=labelRepository.deleteLabelInUser(id,user.getId());
 	   	if(i!=0)
 	   	return true;
 	   	else
@@ -68,9 +69,10 @@ public class LabelServiceImpl implements LabelService{
 
 	@Override
 	public boolean renameLabelForUser(String labelname, int id, String jwt) throws LabelNotFoundException {
-	if(utility.validateToken(jwt))
+	UserInfo user=utility.getUser(jwt);
+		if(utility.validateToken(jwt))
 	{
-		int i=labelRepository.renameLabel(labelname,id);
+		int i=labelRepository.renameLabel(labelname,id,user.getId());
 		if(i!=0)
 		return true;
 		else
