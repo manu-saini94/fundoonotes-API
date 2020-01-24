@@ -1,5 +1,7 @@
 package com.bridgelabz.fundoonotes.repository;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -44,6 +46,14 @@ public interface NoteRepository extends JpaRepository<Notes,Integer> {
 	@Query(value="update notes set archieved=?1 where userdetails_id=?2 and id=?3",nativeQuery=true)
 	@Modifying
 	public Integer setArchieving(boolean b,int id1,int id2);
+
+	@Query(value="select * from notes where userdetails_id=?1 and pinned=0",nativeQuery=true)
+	public List<Notes> getNotesByUser(int id);
+
+	@Query(value="select * from notes where userdetails_id=?1 and pinned=1",nativeQuery=true)
+	public List<Notes> getPinnedNotesByUser(int id);
+	
+	
 	
 
 	
