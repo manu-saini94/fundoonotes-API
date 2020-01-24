@@ -1,5 +1,7 @@
 package com.bridgelabz.fundoonotes.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +19,7 @@ import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.NoteNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.UserException;
 import com.bridgelabz.fundoonotes.dto.NoteDTO;
+import com.bridgelabz.fundoonotes.model.Notes;
 import com.bridgelabz.fundoonotes.response.Response;
 import com.bridgelabz.fundoonotes.service.NoteService;
 import com.bridgelabz.fundoonotes.utility.Utility;
@@ -47,11 +50,40 @@ public class NoteController {
 	}
 	
 	@GetMapping("/displayAll/{jwt}")
-	public ResponseEntity<Response> displayAllNotesForUser(@PathVariable("jwt") String jwt)
+	public ResponseEntity<Response> displayAllNotesForUser(@PathVariable("jwt") String jwt) throws JWTTokenException
 	{
-		return null;
+		List<Notes> list=noteService.displayAllNotesByUser(jwt);
+		
+	if(list!=null)
+	{
+		return ResponseEntity.ok().body(new Response(200,"Notes Displayed ",list));
+
+	}
+	else
+	{
+		return ResponseEntity.badRequest().body(new Response(400,"problem in Displaying note",list));
+	}
 		
 	}
+	
+	@GetMapping("/displaypinned/{jwt}")
+	public ResponseEntity<Response> displayPinnedNotesForUser(@PathVariable("jwt") String jwt) throws JWTTokenException
+	{
+		List<Notes> list=noteService.displayPinnedNotesByUser(jwt);
+		
+		if(list!=null)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Notes Displayed ",list));
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Displaying note",list));
+		}
+		
+	}
+	
+	
+	
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<Response> deleteNoteById(@PathVariable("id") int id,@RequestHeader("jwt") String jwt) throws JWTTokenException,UserException
 	{
@@ -112,4 +144,21 @@ public class NoteController {
 
 		}		
 	}
+	
+	@PutMapping("/update/archieve/{id}")
+	public ResponseEntity<Response> updateNoteWithArchieve(@PathVariable("id") int id,@RequestHeader("jwt") String jwt) throws NoteNotFoundException, JWTTokenException
+	{
+	 boolean b=noteService.updateArchieveForNote(id,jwt);
+	 if(b==true)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Note Archieve updated",id));
+		}
+		else
+		{
+			   return ResponseEntity.badRequest().body(new Response(400,"problem in updating Archieve",id));
+
+		}		
+	}
+
+	
 }
