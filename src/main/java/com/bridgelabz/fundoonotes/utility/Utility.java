@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
 import com.bridgelabz.fundoonotes.dto.UserDTO;
+import com.bridgelabz.fundoonotes.model.Notes;
 import com.bridgelabz.fundoonotes.model.UserInfo;
 import com.bridgelabz.fundoonotes.repository.UserRepository;
 
@@ -120,5 +121,14 @@ public class Utility {
 		{
 			UserInfo user=userRepository.findByUsername(getUsernameFromToken(jwt));
 			return user;
+		}
+		
+		public boolean checkCollaborator(Notes note,String email)
+		{
+			if(userRepository.getCollaborator(email,note)!=null)
+				return false;
+			else
+				return true;
+			
 		}
 }
