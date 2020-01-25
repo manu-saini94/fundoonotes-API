@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.bridgelabz.fundoonotes.dto.NoteDTO;
 import com.bridgelabz.fundoonotes.model.Labels;
 import com.bridgelabz.fundoonotes.model.Notes;
+import com.bridgelabz.fundoonotes.model.UserInfo;
 
 @Repository
 @Transactional
@@ -36,8 +37,8 @@ public interface NoteRepository extends JpaRepository<Notes,Integer> {
 	@Modifying
 	public void deleteLabelInNote(int id, int id1);
 
-	@Query(value="from Notes where id=?1")
-	public Notes findNoteById(int id);
+	@Query(value="from Notes where id=?1 and UserDetails=?2")
+	public Notes findNoteById(int id1,int id2);
 	
 	@Query(value="update notes set pinned=?1 where userdetails_id=?2 and id=?3",nativeQuery=true)
 	@Modifying
@@ -55,6 +56,14 @@ public interface NoteRepository extends JpaRepository<Notes,Integer> {
 
 	@Query(value="select * from notes where id=?1 and userdetails_id=?2",nativeQuery=true)
 	public Notes getNoteByNoteId(int id, int id2);
+
+	@Query(value="update notes set color=?1 where userdetails_id=?2",nativeQuery=true)
+	@Modifying
+	public int setColorForNote(String color,int id);
+	
+	
+	
+	
 	
 
 	

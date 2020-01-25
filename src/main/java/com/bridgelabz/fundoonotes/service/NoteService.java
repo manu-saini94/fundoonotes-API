@@ -21,6 +21,8 @@ public interface NoteService {
 	public boolean updateArchieveForNote(int id, String jwt) throws NoteNotFoundException, JWTTokenException;
 	public List<Notes> displayAllNotesByUser(String jwt) throws JWTTokenException;
 	public List<Notes> displayPinnedNotesByUser(String jwt) throws JWTTokenException;
+	public boolean updateColorForNote(String jwt, int id, String color) throws JWTTokenException;
+	
 	
 	
 	

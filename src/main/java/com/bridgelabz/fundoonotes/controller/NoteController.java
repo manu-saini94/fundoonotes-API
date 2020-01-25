@@ -161,4 +161,20 @@ public class NoteController {
 	}
 
 	
+	@PutMapping("/update/color/{id}")
+	public ResponseEntity<Response> updateColorForNote(@PathVariable("id") int id,@RequestHeader("jwt") String jwt,@RequestHeader("color") String color) throws JWTTokenException
+	{
+		boolean b=noteService.updateColorForNote(jwt,id,color);
+		if(b==true)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Color updated for note",id));	
+		}
+		else
+		{
+		    return ResponseEntity.badRequest().body(new Response(400,"problem in updating color",id));
+
+		}
+		
+		
+	}
 }

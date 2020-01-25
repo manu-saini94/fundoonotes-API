@@ -145,7 +145,7 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		if(utility.validateToken(jwt))
 		{
 			user=utility.getUser(jwt);
-			Notes note=noteRepository.findNoteById(id);
+			Notes note=noteRepository.findNoteById(id,user.getId());
 			if(note!=null)
 			{
               if(!note.isPinned() && note.isArchieved())
@@ -196,7 +196,7 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		if(utility.validateToken(jwt))
 		{
 			user=utility.getUser(jwt);
-			Notes note=noteRepository.findNoteById(id);
+			Notes note=noteRepository.findNoteById(id,user.getId());
 			if(note!=null)
 			{
               if(!note.isArchieved() &&  note.isPinned())
@@ -271,6 +271,28 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		}
 		else
 		throw new JWTTokenException("Token Not Found Exception");	
+		
+	}
+	
+	@Override
+	public boolean updateColorForNote(String jwt, int id, String color) throws JWTTokenException {
+	
+		UserInfo user=null;
+		boolean flag=false;
+		if(utility.validateToken(jwt))
+		{
+			user=utility.getUser(jwt);
+			Notes note=noteRepository.findNoteById(id,user.getId());
+			int i=noteRepository.setColorForNote(color,note.getId());
+			if(i!=0)
+			{
+				return true;
+			}
+			else
+				return false;
+		}
+		else
+			throw new JWTTokenException("Token Not Found Exception");
 		
 	}
 	
