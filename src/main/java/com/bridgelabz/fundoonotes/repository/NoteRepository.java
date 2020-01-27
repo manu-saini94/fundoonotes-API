@@ -61,8 +61,13 @@ public interface NoteRepository extends JpaRepository<Notes,Integer> {
 	@Modifying
 	public int setColorForNote(String color,int id);
 
-	@Query(value="select * from notes where userdetails_id=?1 and trashed=1",nativeQuery=true)
-	public List<Notes> getTrashedNotesByUser(int id);
+
+	
+	
+	
+	
+	
+	
 	
 	
 	

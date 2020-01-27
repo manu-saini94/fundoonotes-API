@@ -53,13 +53,6 @@ public class Collaborator {
 	public void setNotes(Notes notes) {
 		this.notes = notes;
 	}
-
-	@Override
-	public String toString() {
-		return "Collaborator [id=" + id + ", collaborator=" + collaborator + ", notes=" + notes + "]";
-	}
-	
-	
 	
 	
 }

@@ -17,7 +17,6 @@ public interface LabelService {
 	
 	public boolean displayNoteForLabel(int id,String jwt) throws NoteNotFoundException;
 
-
 	public List<String> displayAllLabels(String jwt) throws LabelNotFoundException, JWTTokenException;
 	
 	

@@ -1,6 +1,7 @@
 package com.bridgelabz.fundoonotes.serviceimpl;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
@@ -19,6 +20,7 @@ import com.bridgelabz.fundoonotes.Exceptions.JWTTokenException;
 import com.bridgelabz.fundoonotes.dto.ForgotDTO;
 import com.bridgelabz.fundoonotes.dto.LoginDTO;
 import com.bridgelabz.fundoonotes.dto.UserDTO;
+import com.bridgelabz.fundoonotes.model.Notes;
 import com.bridgelabz.fundoonotes.model.UserInfo;
 import com.bridgelabz.fundoonotes.repository.UserRepository;
 import com.bridgelabz.fundoonotes.response.Response;
@@ -36,8 +38,6 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	private ModelMapper modelMapper;
 	
 	private BCryptPasswordEncoder bcrypt;
-	
-
 	
 	private String jwt; 
 	
@@ -79,6 +79,7 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 		String jwt=utility.generateToken(new User(user.getUsername(),user.getPassword(),new ArrayList<>()));
 		String url="http://localhost:8080/user/resetpassword?jwt="+jwt;
 		utility.sendEMail(email,"changing password",url);
+    
     }
 	
 
@@ -161,8 +162,126 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 	UserInfo user=userRepository.findByUsername(username);
-	return new User(user.getUsername(),user.getPassword(),new ArrayList());
+	return new User(user.getUsername(),user.getPassword(),new ArrayList<>());
 		
 	}
 
+	
+	@Override
+	public List<Notes> displayTrashNotesByUser(String jwt) throws JWTTokenException {
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		List<Notes> notes=userRepository.getTrashedNotesByUser(user.getId());
+		return notes;
+		}
+		else
+		throw new JWTTokenException("Token Not Found Exception");	
+		
+	}
+
+
+	@Override
+	public boolean restoreNoteFromTrash(String jwt, int id) throws JWTTokenException {
+   		
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		Notes note=userRepository.findNoteById(user,id);
+		int i=userRepository.restoreNoteByUser(user.getId(),note.getId());
+        if(i!=0)
+	    return true;
+        else
+	    return false;
+			}
+		else
+		throw new JWTTokenException("Token Not Found Exception");		
+		}
+
+
+	@Override
+	public boolean deleteNoteFromTrash(String jwt, int id) throws JWTTokenException {
+	
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		Notes note=userRepository.findNoteById(user,id);
+		int i=userRepository.deleteNoteFromTrashByUser(user.getId(),note.getId());
+        if(i!=0)
+	    return true;
+        else
+	    return false;
+			}
+		else
+		throw new JWTTokenException("Token Not Found Exception");		
+	
+	}
+
+
+	@Override
+	public boolean emptyTrashByUser(String jwt, int id) throws JWTTokenException 
+	{
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		Notes note=userRepository.findNoteById(user,id);
+		int i=userRepository.emptyTrashForUser(user.getId(),note.getId());
+        if(i!=0)
+	    return true;
+        else
+	    return false;
+			}
+		else
+		throw new JWTTokenException("Token Not Found Exception");	
+		
+		}
+
+
+	@Override
+	public  Object[] displaySortedByName(String jwt) throws JWTTokenException {
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		Object[] notes=userRepository.getSortedNotesByName(user.getId());
+		System.out.println(notes);
+		return notes;
+		}
+		else
+		throw new JWTTokenException("Token Not Found Exception");	
+
+	}
+
+
+	@Override
+	public Object[] displaySortedById(String jwt) throws JWTTokenException {
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		Object[] notes=userRepository.getSortedNotesById(user.getId());
+		System.out.println(notes);
+		return notes;
+		}
+		else
+		throw new JWTTokenException("Token Not Found Exception");		}
+
+
+	@Override
+	public Object[] displaySortedByDate(String jwt) throws JWTTokenException {
+		
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		Object[] notes=userRepository.getSortedNotesByDate(user.getId());
+		System.out.println(notes);
+		return notes;
+		}
+		else
+		throw new JWTTokenException("Token Not Found Exception");	}
 }

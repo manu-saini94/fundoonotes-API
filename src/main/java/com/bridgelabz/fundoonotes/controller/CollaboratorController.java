@@ -2,7 +2,6 @@ package com.bridgelabz.fundoonotes.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bridgelabz.fundoonotes.Exceptions.CollaboratorIsNotFoundException;
+import com.bridgelabz.fundoonotes.Exceptions.CollaboratorNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.EmailAlreadyExistException;
 import com.bridgelabz.fundoonotes.Exceptions.NoteNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.UserException;
@@ -25,7 +24,6 @@ import com.bridgelabz.fundoonotes.service.CollaboratorService;
 public class CollaboratorController {
 
 	
-	@Autowired
 	CollaboratorService collaboratorService;
 	
 	@PostMapping("/add")
@@ -43,7 +41,7 @@ public class CollaboratorController {
 	}
 	
 	@DeleteMapping("/delete")
-	public ResponseEntity<Response> deleteCollaboratorForNote(@RequestBody CollaboratorDTO collaboratordto,@RequestHeader("jwt") String jwt) throws CollaboratorIsNotFoundException
+	public ResponseEntity<Response> deleteCollaboratorForNote(@RequestBody CollaboratorDTO collaboratordto,@RequestHeader("jwt") String jwt) throws CollaboratorNotFoundException
 	{
 		if(collaboratorService.deleteCollaborator(collaboratordto,jwt))
 		{
@@ -58,7 +56,7 @@ public class CollaboratorController {
 	}
 
 	@GetMapping("/get")
-	public ResponseEntity<Response> getCollaboratorForNote(@RequestHeader("id") int id,@RequestHeader("jwt") String jwt) throws NoteNotFoundException, CollaboratorIsNotFoundException
+	public ResponseEntity<Response> getCollaboratorForNote(@RequestHeader("id") int id,@RequestHeader("jwt") String jwt) throws NoteNotFoundException, CollaboratorNotFoundException
 	{
 		List collaborators=collaboratorService.getCollaboratorByNoteId(id);
 		return ResponseEntity.ok().body(new Response(200,"Collaborators are retrieved", collaborators));

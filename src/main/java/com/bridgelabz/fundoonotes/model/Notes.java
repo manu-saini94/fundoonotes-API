@@ -31,9 +31,13 @@ public class Notes {
 
 	@Column(columnDefinition="boolean default false")
     private boolean trashed;
+	
     @Column(columnDefinition="boolean default false")
     private boolean pinned;
-    private String reminder;
+    
+    @Column(columnDefinition="timestamp default current_timestamp")
+    private Date reminder;
+    
     private String color;
     @LastModifiedDate
     private Date lastupdate;
@@ -68,6 +72,17 @@ public Notes(String title, String takeanote, String color, UserInfo userdetails)
 	this.takeanote = takeanote;
 	this.color = color;
 	this.userdetails = userdetails;
+}
+
+
+
+public Date getReminder() {
+	return reminder;
+}
+
+
+public void setReminder(Date reminder) {
+	this.reminder = reminder;
 }
 
 
@@ -145,16 +160,6 @@ public boolean isPinned() {
 
 public void setPinned(boolean pinned) {
 	this.pinned = pinned;
-}
-
-
-public String getReminder() {
-	return reminder;
-}
-
-
-public void setReminder(String reminder) {
-	this.reminder = reminder;
 }
 
 

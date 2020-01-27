@@ -1,8 +1,6 @@
 package com.bridgelabz.fundoonotes.controller;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 import javax.validation.Valid;
@@ -10,14 +8,13 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundoonotes.Exceptions.JWTTokenException;
@@ -26,8 +23,8 @@ import com.bridgelabz.fundoonotes.dto.ForgotDTO;
 import com.bridgelabz.fundoonotes.dto.LoginDTO;
 import com.bridgelabz.fundoonotes.dto.PasswordDTO;
 import com.bridgelabz.fundoonotes.dto.UserDTO;
+import com.bridgelabz.fundoonotes.model.Notes;
 import com.bridgelabz.fundoonotes.response.Response;
-import com.bridgelabz.fundoonotes.response.UserResponse;
 import com.bridgelabz.fundoonotes.service.UserService;
 import com.bridgelabz.fundoonotes.utility.Utility;
 
@@ -102,4 +99,118 @@ public class UserController {
 		
 	}
 	
+
+	@GetMapping("/displaytrash/{jwt}")
+	public ResponseEntity<Response> displayTrashedNotesForUser(@PathVariable("jwt") String jwt) throws JWTTokenException
+	{
+		List<Notes> list=userService.displayTrashNotesByUser(jwt);
+		
+		if(list!=null)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Trash Notes Displayed ",list));
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Displaying Trash notes",list));
+		}
+		
+	}
+	
+	@PutMapping("/restore/{jwt}")
+	public ResponseEntity<Response> restoreFromTrashForUser(@PathVariable("jwt") String jwt,@RequestHeader("id") int id) throws JWTTokenException
+	{
+		boolean b=userService.restoreNoteFromTrash(jwt,id);
+		if(b==true)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Notes Restored ",id));
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Restoring Trash notes",id));
+		}
+		
+	}
+	
+	
+	@PutMapping("/deleteforever/{jwt}")
+	public ResponseEntity<Response> deleteFromTrashForUser(@PathVariable("jwt") String jwt,@RequestHeader("id") int id) throws JWTTokenException
+	{
+		boolean b=userService.deleteNoteFromTrash(jwt,id);
+		if(b==true)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Note Deleted from trash",id));
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Deleting Trash notes",id));
+		}
+		
+	}
+	
+	@PutMapping("/emptytrash/{jwt}")
+	public ResponseEntity<Response> emptyTrashForUser(@PathVariable("jwt") String jwt,@RequestHeader("id") int id) throws JWTTokenException
+	{
+		boolean b=userService.emptyTrashByUser(jwt,id);
+		if(b==true)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Note Deleted from trash",id));
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Deleting Trash notes",id));
+		}
+		
+	}
+	
+    
+	@GetMapping("/sortbyname/{jwt}")
+	public ResponseEntity<Response> displaySortedNotesByName(@PathVariable("jwt") String jwt) throws JWTTokenException
+	{
+		Object[] notes=userService.displaySortedByName(jwt);
+		
+		if(notes!=null)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Sorted Notes By Name Displayed ",notes));
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Displaying Sorted notes",notes));
+		}
+		
+	}
+
+	 
+		@GetMapping("/sortbyid/{jwt}")
+		public ResponseEntity<Response> displaySortedNotesById(@PathVariable("jwt") String jwt) throws JWTTokenException
+		{
+			Object[] notes=userService.displaySortedById(jwt);
+			
+			if(notes!=null)
+			{
+				return ResponseEntity.ok().body(new Response(200,"Sorted Notes By Id Displayed ",notes));
+			}
+			else
+			{
+				return ResponseEntity.badRequest().body(new Response(400,"problem in Displaying Sorted notes",notes));
+			}
+			
+		}
+	
+		
+		
+		@GetMapping("/sortbydate/{jwt}")
+		public ResponseEntity<Response> displaySortedNotesByDate(@PathVariable("jwt") String jwt) throws JWTTokenException
+		{
+			Object[] notes=userService.displaySortedByDate(jwt);
+			
+			if(notes!=null)
+			{
+				return ResponseEntity.ok().body(new Response(200,"Sorted Notes By Date Displayed ",notes));
+			}
+			else
+			{
+				return ResponseEntity.badRequest().body(new Response(400,"problem in Displaying Sorted notes",notes));
+			}
+			
+		}
 }

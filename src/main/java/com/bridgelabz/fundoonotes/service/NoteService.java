@@ -22,8 +22,6 @@ public interface NoteService {
 	public List<Notes> displayAllNotesByUser(String jwt) throws JWTTokenException;
 	public List<Notes> displayPinnedNotesByUser(String jwt) throws JWTTokenException;
 	public boolean updateColorForNote(String jwt, int id, String color) throws JWTTokenException;
-	public List<Notes> displayTrashedNotesByUser(String jwt) throws JWTTokenException;
-	public boolean restoreFromTrash(String jwt);
 	
 	
 	

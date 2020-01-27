@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.bridgelabz.fundoonotes.Exceptions.CollaboratorIsNotFoundException;
+import com.bridgelabz.fundoonotes.Exceptions.CollaboratorNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.EmailAlreadyExistException;
 import com.bridgelabz.fundoonotes.Exceptions.NoteNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.UserException;
@@ -34,11 +34,9 @@ public class CollaboratorServiceImpl implements CollaboratorService{
     UserInfo user=utility.getUser(jwt);
 		if(collaboratorRepository.findByEmail(collaboratordto.getCollaborator())!=null && !user.getEmail().equals(collaboratordto.getCollaborator()))
 		{
-			System.out.println(collaboratordto.getNoteId());
 			Notes note = collaboratorRepository.getNotes(collaboratordto.getNoteId());
 			if (utility.checkCollaborator(note, collaboratordto.getCollaborator())) {
 				Collaborator collaborator = new Collaborator(collaboratordto.getCollaborator(), note);
-				System.out.println(collaborator);
 				collaboratorRepository.save(collaborator);	
 				return true;
 			}
@@ -52,19 +50,19 @@ public class CollaboratorServiceImpl implements CollaboratorService{
 	}
 
 	@Override
-	public boolean deleteCollaborator(CollaboratorDTO collaboratordto, String jwt) throws CollaboratorIsNotFoundException {
+	public boolean deleteCollaborator(CollaboratorDTO collaboratordto, String jwt) throws CollaboratorNotFoundException {
 		if(collaboratorRepository.getCollaborator(collaboratordto.getCollaborator(),collaboratordto.getNoteId())!=null)
 	    {
 			collaboratorRepository.deleteCollaboratorFromNote(collaboratordto.getCollaborator(), collaboratordto.getNoteId());
 	    return true;
 	    }
 		else
-				throw new CollaboratorIsNotFoundException("No collaborator found");
+				throw new CollaboratorNotFoundException("No collaborator found");
 	
 	}
 
 	@Override
-	public List getCollaboratorByNoteId(int id) throws NoteNotFoundException, CollaboratorIsNotFoundException {
+	public List getCollaboratorByNoteId(int id) throws NoteNotFoundException, CollaboratorNotFoundException {
 	
 		Notes note=collaboratorRepository.getNotes(id);
 		
@@ -74,7 +72,7 @@ public class CollaboratorServiceImpl implements CollaboratorService{
 		if(note.getCollaborator()!=null)
 			return note.getCollaborator();
 		else
-			throw new CollaboratorIsNotFoundException("No collaborator found");
+			throw new CollaboratorNotFoundException("No collaborator found");
 	
 	}
 	

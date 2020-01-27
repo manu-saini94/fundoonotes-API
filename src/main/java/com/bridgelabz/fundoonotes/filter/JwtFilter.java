@@ -15,7 +15,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.bridgelabz.fundoonotes.serviceimpl.LoginServiceImpl;
+import com.bridgelabz.fundoonotes.serviceimpl.UserServiceImpl;
 import com.bridgelabz.fundoonotes.utility.Utility;
 
 @Component
@@ -25,7 +25,7 @@ public class JwtFilter extends OncePerRequestFilter {
 	Utility utility;
 	
 	@Autowired
-	LoginServiceImpl user;
+	UserServiceImpl user;
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
