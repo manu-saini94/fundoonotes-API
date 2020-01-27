@@ -82,6 +82,22 @@ public class NoteController {
 		
 	}
 	
+	@GetMapping("/displaytrash/{jwt}")
+	public ResponseEntity<Response> displayTrashedNotesForUser(@PathVariable("jwt") String jwt) throws JWTTokenException
+	{
+		List<Notes> list=noteService.displayTrashedNotesByUser(jwt);
+		if(list!=null)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Trash Notes Displayed ",list));
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Displaying Trash notes",list));
+		}
+		
+	}
+	
+	
 	
 	
 	@DeleteMapping("/delete/{id}")
@@ -175,6 +191,13 @@ public class NoteController {
 
 		}
 		
+		
+	}
+	
+	public ResponseEntity<Response> restoreNotesFromTrash(@PathVariable("jwt") String jwt,@RequestHeader("id") int id )
+	{
+		boolean b=noteService.restoreFromTrash(jwt);
+		return null;
 		
 	}
 }

@@ -296,6 +296,32 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		
 	}
 	
+	
+	
+	@Override
+	public List<Notes> displayTrashedNotesByUser(String jwt) throws JWTTokenException {
+
+		UserInfo user=null;
+		boolean flag=false;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		List<Notes> notes=noteRepository.getTrashedNotesByUser(user.getId());
+		return notes;
+		}
+		else
+		throw new JWTTokenException("Token Not Found Exception");	
+	}
+	
+	
+	
+	@Override
+	public boolean restoreFromTrash(String jwt) {
+
+
+		return false;
+	}
+	
 
 	
 
