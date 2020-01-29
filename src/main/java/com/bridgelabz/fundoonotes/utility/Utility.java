@@ -61,11 +61,13 @@ public class Utility {
 			return expiration.before(new Date());
 		}
 		
+		
 		public String generateToken(UserDetails userdetails) {
 			Map<String, Object> claims = new HashMap<String, Object>();
 			return createToken(claims, userdetails.getUsername());
-
-		}
+        }
+		
+		
 		public String createToken(Map<String, Object> claims, String subject) {
 			return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 					.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
@@ -91,6 +93,8 @@ public class Utility {
 			System.out.println(mail);
 			javaMailSender.send(mail);
 		}
+		
+		
 		
 		public List getErrors(BindingResult result,UserDTO userdto)
 		{
@@ -128,6 +132,7 @@ public class Utility {
 			if(userRepository.getCollaborator(email,note)!=null)
 				return false;
 			else
+				
 				return true;
 			
 		}

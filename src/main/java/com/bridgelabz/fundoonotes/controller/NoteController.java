@@ -57,7 +57,6 @@ public class NoteController {
 	if(list!=null)
 	{
 		return ResponseEntity.ok().body(new Response(200,"Notes Displayed ",list));
-
 	}
 	else
 	{
@@ -90,13 +89,13 @@ public class NoteController {
 		if(noteService.deleteNote(id,jwt))
 		{
 			return ResponseEntity.ok().body(new Response(200,"Note Deleted",id));
-
 		}
 		else
 		{
 			return ResponseEntity.badRequest().body(new Response(400,"problem in Deleting note",id));
 		}
 	}
+	
 	
 	@PutMapping("/update/label/{id}")
 	public ResponseEntity<Response> updateNoteById(@PathVariable("id") int id,@RequestBody NoteDTO updatedto,@RequestHeader("jwt") String jwt) throws JWTTokenException, NoteNotFoundException
@@ -109,10 +108,9 @@ public class NoteController {
 	   else
 	   {
 		   return ResponseEntity.badRequest().body(new Response(400,"problem in creating label",id));
-	   }
-		
-		
+	   }	
 	}
+	
 	
 	@DeleteMapping("/delete/label/{id}")
 	public ResponseEntity<Response> deleteLabelFromNote(@PathVariable("id") int id,@RequestHeader("id1") int id1,@RequestHeader("jwt") String jwt) throws LabelNotFoundException, JWTTokenException, NoteNotFoundException
@@ -156,7 +154,6 @@ public class NoteController {
 		else
 		{
 			   return ResponseEntity.badRequest().body(new Response(400,"problem in updating Archieve",id));
-
 		}		
 	}
 
@@ -172,7 +169,6 @@ public class NoteController {
 		else
 		{
 		    return ResponseEntity.badRequest().body(new Response(400,"problem in updating color",id));
-
 		}
 		
 		

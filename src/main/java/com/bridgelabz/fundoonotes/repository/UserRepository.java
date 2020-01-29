@@ -20,7 +20,8 @@ public interface UserRepository extends JpaRepository<UserInfo,Integer> {
 	@Query(value="insert into user_info(username,firstname,lastname,email,password) values(:username,:firstname,:lastname,:email,:password)",nativeQuery=true)
 	@Modifying	
 	public Integer SaveUser(String username,String firstname,String lastname,String email,String password);
-
+	
+	
 	@Query("from UserInfo where username=?1")
     UserInfo findByUsername(String username);
 	

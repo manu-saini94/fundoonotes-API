@@ -37,7 +37,8 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	private BCryptPasswordEncoder bcrypt;
+	private BCryptPasswordEncoder bcrypt; 
+	
 	
 	private String jwt; 
 	
@@ -72,6 +73,7 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 		String url="http://localhost:8080/user/verifyemail?jwt="+jwt;
 		utility.sendEMail(email,"verifying email",url);
 	}
+	
 	
     public void PassDetails(String email) 
     {
@@ -141,6 +143,7 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 		}
 	}
 
+	
 	@Override
 	public void forgotPassword(ForgotDTO forgotdto) {
 		

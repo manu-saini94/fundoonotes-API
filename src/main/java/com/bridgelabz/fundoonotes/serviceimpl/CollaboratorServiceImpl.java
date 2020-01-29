@@ -20,14 +20,17 @@ import com.bridgelabz.fundoonotes.utility.Utility;
 @Service
 public class CollaboratorServiceImpl implements CollaboratorService{
 
+	
 	CollaboratorRepository collaboratorRepository;
 	Utility utility;
+	
 	
 	@Autowired
 	public CollaboratorServiceImpl(CollaboratorRepository collaboratorRepository, Utility utility) {
 		this.collaboratorRepository = collaboratorRepository;
 		this.utility = utility;
 	}
+	
 	
 	@Override
 	public boolean addCollaborator(CollaboratorDTO collaboratordto,String jwt) throws EmailAlreadyExistException, UserException {
@@ -61,6 +64,7 @@ public class CollaboratorServiceImpl implements CollaboratorService{
 	
 	}
 
+	
 	@Override
 	public List getCollaboratorByNoteId(int id) throws NoteNotFoundException, CollaboratorNotFoundException {
 	
