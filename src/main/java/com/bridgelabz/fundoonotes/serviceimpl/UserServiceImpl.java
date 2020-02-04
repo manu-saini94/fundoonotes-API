@@ -77,6 +77,7 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	
     public void PassDetails(String email) 
     {
+
     	UserInfo user=userRepository.findByEmail(email);
 		String jwt=utility.generateToken(new User(user.getUsername(),user.getPassword(),new ArrayList<>()));
 		String url="http://localhost:8080/user/resetpassword?jwt="+jwt;

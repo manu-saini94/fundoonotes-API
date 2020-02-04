@@ -58,6 +58,7 @@ public class UserController {
 		
 	}
 	
+	
 	@GetMapping("/verifyemail/{jwt}")
 	public ResponseEntity<Response> checkEmail(@PathVariable("jwt") String jwt) throws JWTTokenException
 	{
