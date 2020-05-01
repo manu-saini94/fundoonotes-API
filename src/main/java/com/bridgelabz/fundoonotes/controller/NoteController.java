@@ -1,9 +1,11 @@
 package com.bridgelabz.fundoonotes.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,11 +23,14 @@ import com.bridgelabz.fundoonotes.Exceptions.UserException;
 import com.bridgelabz.fundoonotes.dto.NoteDTO;
 import com.bridgelabz.fundoonotes.model.Notes;
 import com.bridgelabz.fundoonotes.response.Response;
+import com.bridgelabz.fundoonotes.service.ElasticSearchService;
 import com.bridgelabz.fundoonotes.service.NoteService;
 import com.bridgelabz.fundoonotes.utility.Utility;
 
 @RestController
 @RequestMapping("/note")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+
 public class NoteController {
 
 	@Autowired
@@ -34,18 +39,57 @@ public class NoteController {
 	@Autowired
 	Utility utility;
 	
+	@Autowired
+	private ElasticSearchService elasticService;
+	
+	@GetMapping("/search")
+	public ResponseEntity<Response> searchTitle(@RequestHeader String title) throws IOException {
+		List<Notes> data =null;
+		try {
+			data = elasticService.getNoteByTitleAndDescription(title);
+		} catch (Exception e) {		
+			e.printStackTrace();
+		}
+		if(data!=null)
+			return ResponseEntity.ok().body(new Response(200,"Notes Searched and found",data));
+		else
+			if(data==null)
+				return ResponseEntity.ok().body(new Response(200,"Notes Searched and not found",data));
+			else
+				return ResponseEntity.badRequest().body(new Response(400,"problem in searching notes",data));
+
+		
+}
+	
 	@PostMapping("/create/{jwt}")
 	public ResponseEntity<Response> createNote(@RequestBody NoteDTO notedto,@PathVariable("jwt") String jwt) throws JWTTokenException,UserException
 	{
-		if(noteService.saveNewNote(notedto,jwt))
+		Notes note=noteService.saveNewNote(notedto,jwt);
+		if(note!=null)
 		{
-			return ResponseEntity.ok().body(new Response(200,"Note Created",notedto));
+			return ResponseEntity.ok().body(new Response(200,"Note Created",note));
 		}
 		else
 		{
 			return ResponseEntity.badRequest().body(new Response(400,"problem in creating note",notedto));
-		}
+		}	
 		
+	}
+	
+	@PutMapping("/updateAll/{jwt}")
+	public ResponseEntity<Response> updateNote(@RequestBody NoteDTO notedto,@PathVariable("jwt") String jwt) throws JWTTokenException,UserException, NoteNotFoundException
+	{
+		System.out.println("cont entered:");
+		Notes note=noteService.updateToNote(notedto,jwt);
+		System.out.println("note val in cont :"+note);
+		if(note!=null)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Note Updated",note));
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Updating note",notedto));
+		}	
 		
 	}
 	
@@ -83,7 +127,7 @@ public class NoteController {
 	
 	
 	
-	@DeleteMapping("/delete/{id}")
+	@PutMapping("/delete/{id}")
 	public ResponseEntity<Response> deleteNoteById(@PathVariable("id") int id,@RequestHeader("jwt") String jwt) throws JWTTokenException,UserException
 	{
 		if(noteService.deleteNote(id,jwt))
@@ -128,6 +172,22 @@ public class NoteController {
 		
 	}
 	
+	@PutMapping("/update/title&takeanote/{id}")
+	public ResponseEntity<Response> updateNoteWithTitleAndTakeanote(@RequestBody NoteDTO notedto,@PathVariable("id") int id,@RequestHeader("jwt") String jwt) throws JWTTokenException, NoteNotFoundException
+	{
+		boolean b=noteService.updateTitleAndTakeanote(id,jwt,notedto);
+		if(b==true)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Note title and description updated",id));
+
+		}
+		else
+		{
+			   return ResponseEntity.badRequest().body(new Response(400,"problem in updating title and description",id));
+
+		}
+	}
+	
 	@PutMapping("/update/pin/{id}")
 	public ResponseEntity<Response> updateNoteWithPin(@PathVariable("id") int id,@RequestHeader("jwt") String jwt) throws NoteNotFoundException, JWTTokenException
 	{
@@ -143,25 +203,27 @@ public class NoteController {
 		}		
 	}
 	
-	@PutMapping("/update/archieve/{id}")
+	@PutMapping("/update/archive/{id}")
 	public ResponseEntity<Response> updateNoteWithArchieve(@PathVariable("id") int id,@RequestHeader("jwt") String jwt) throws NoteNotFoundException, JWTTokenException
 	{
-	 boolean b=noteService.updateArchieveForNote(id,jwt);
+	 boolean b=noteService.updateArchiveForNote(id,jwt);
 	 if(b==true)
 		{
-			return ResponseEntity.ok().body(new Response(200,"Note Archieve updated",id));
+			return ResponseEntity.ok().body(new Response(200,"Note Archive updated",id));
 		}
 		else
 		{
-			   return ResponseEntity.badRequest().body(new Response(400,"problem in updating Archieve",id));
+			   return ResponseEntity.badRequest().body(new Response(400,"problem in updating Archive",id));
 		}		
 	}
 
 	
 	@PutMapping("/update/color/{id}")
-	public ResponseEntity<Response> updateColorForNote(@PathVariable("id") int id,@RequestHeader("jwt") String jwt,@RequestHeader("color") String color) throws JWTTokenException
+	public ResponseEntity<Response> updateColorForNote(@PathVariable("id") int id,@RequestHeader("jwt") String jwt,@RequestHeader("color") String color) throws JWTTokenException, NoteNotFoundException
 	{
+		System.out.println("color = "+color);
 		boolean b=noteService.updateColorForNote(jwt,id,color);
+		
 		if(b==true)
 		{
 			return ResponseEntity.ok().body(new Response(200,"Color updated for note",id));	
@@ -174,5 +236,118 @@ public class NoteController {
 		
 	}
 	
+	@GetMapping("/displaytrash/{jwt}")
+	public ResponseEntity<Response> displayTrashedNotesForUser(@PathVariable("jwt") String jwt) throws JWTTokenException
+	{
+		List<Notes> list=noteService.displayTrashNotesByUser(jwt);
+		
+		if(list!=null)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Trash Notes Displayed ",list));
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Displaying Trash notes",list));
+		}
+		
+	}
+	
+	@PutMapping("/restore/{jwt}")
+	public ResponseEntity<Response> restoreFromTrashForUser(@PathVariable("jwt") String jwt,@RequestHeader("id") int id) throws JWTTokenException
+	{
+		boolean b=noteService.restoreNoteFromTrash(jwt,id);
+		if(b==true)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Notes Restored ",id));
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Restoring Trash notes",id));
+		}
+		
+	}
+	
+	
+	@PutMapping("/deleteforever/{jwt}")
+	public ResponseEntity<Response> deleteFromTrashForUser(@PathVariable("jwt") String jwt,@RequestHeader("id") int id) throws JWTTokenException
+	{
+		boolean b=noteService.deleteNoteFromTrash(jwt,id);
+		if(b==true)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Note Deleted from trash",id));
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Deleting Trash notes",id));
+		}
+		
+	}
+	
+	@PutMapping("/emptytrash/{jwt}")
+	public ResponseEntity<Response> emptyTrashForUser(@PathVariable("jwt") String jwt) throws JWTTokenException
+	{
+		boolean b=noteService.emptyTrashByUser(jwt);
+		if(b==true)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Trash is empty",null));
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Emptying Trash",null));
+		}
+		
+	}
+	
+    
+	@GetMapping("/sortbyname/{jwt}")
+	public ResponseEntity<Response> displaySortedNotesByName(@PathVariable("jwt") String jwt) throws JWTTokenException
+	{
+		Object[] notes=noteService.displaySortedByName(jwt);
+		
+		if(notes!=null)
+		{
+			return ResponseEntity.ok().body(new Response(200,"Sorted Notes By Name Displayed ",notes));
+		}
+		else
+		{
+			return ResponseEntity.badRequest().body(new Response(400,"problem in Displaying Sorted notes",notes));
+		}
+		
+	}
+
+	 
+		@GetMapping("/sortbyid/{jwt}")
+		public ResponseEntity<Response> displaySortedNotesById(@PathVariable("jwt") String jwt) throws JWTTokenException
+		{
+			Object[] notes=noteService.displaySortedById(jwt);
+			
+			if(notes!=null)
+			{
+				return ResponseEntity.ok().body(new Response(200,"Sorted Notes By Id Displayed ",notes));
+			}
+			else
+			{
+				return ResponseEntity.badRequest().body(new Response(400,"problem in Displaying Sorted notes",notes));
+			}
+			
+		}
+	
+		
+		
+		@GetMapping("/sortbydate/{jwt}")
+		public ResponseEntity<Response> displaySortedNotesByDate(@PathVariable("jwt") String jwt) throws JWTTokenException
+		{
+			Object[] notes=noteService.displaySortedByDate(jwt);
+			
+			if(notes!=null)
+			{
+				return ResponseEntity.ok().body(new Response(200,"Sorted Notes By Date Displayed ",notes));
+			}
+			else
+			{
+				return ResponseEntity.badRequest().body(new Response(400,"problem in Displaying Sorted notes",notes));
+			}
+			
+		}
 	
 }

@@ -25,5 +25,6 @@ public class LoginConfiguration extends WebSecurityConfigurerAdapter {
 		.and().addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class)
 		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	
+	
 	}
 }

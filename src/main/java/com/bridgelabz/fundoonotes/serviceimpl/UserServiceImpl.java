@@ -8,7 +8,8 @@ import javax.security.auth.login.LoginException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -37,8 +38,11 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	@Autowired
 	private ModelMapper modelMapper;
 	
+	
 	private BCryptPasswordEncoder bcrypt; 
 	
+	@Autowired
+	private KafkaTemplate<String, String> kafkaTemplate;
 	
 	private String jwt; 
 	
@@ -47,85 +51,77 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 	
 	@Override
 	public boolean Register(UserDTO userdto) {
-		
-		boolean flag=false;
-		try {
-			
+		Integer I=0;
+		String token=null;
+		try {		
 			UserInfo user=modelMapper.map(userdto,UserInfo.class);
-			Integer I=userRepository.SaveUser(user.getUsername(),user.getFirstname(),user.getLastname(),user.getEmail(),user.getPassword());
-			flag=true;
-			MailDetails(user.getEmail());
-				
+			I=userRepository.SaveUser(user.getMobileno(),user.getFirstname(),user.getLastname(),user.getEmail(),user.getPassword());	
+		    kafkaTemplate.send("myfundoo",user.getEmail());				
 		} 
-		catch(Exception e) {
-			
-			e.printStackTrace();
-			
+		catch(Exception e) {		
+			e.printStackTrace();		
 		}
-		return flag;
+		if(I!=0)
+		return true;
+		else
+		return false;
 	}
 	
-	
-	public void MailDetails(String email)
-	{
-		UserInfo user=userRepository.findByEmail(email);
-		String jwt=utility.generateToken(new User(user.getUsername(),user.getPassword(),new ArrayList<>()));
-		String url="http://localhost:8080/user/verifyemail?jwt="+jwt;
-		utility.sendEMail(email,"verifying email",url);
-	}
-	
-	
-    public void PassDetails(String email) 
-    {
-
-    	UserInfo user=userRepository.findByEmail(email);
-		String jwt=utility.generateToken(new User(user.getUsername(),user.getPassword(),new ArrayList<>()));
-		String url="http://localhost:8080/user/resetpassword?jwt="+jwt;
-		utility.sendEMail(email,"changing password",url);
-    
-    }
-	
-
+	@KafkaListener(topics = "myfundoo", groupId = "group")
+	 public void consume(String message) {
+	 UserInfo user=userRepository.findByEmail(message);
+	 String token=utility.generateToken(new User(user.getEmail(),user.getPassword(),new ArrayList<>()));
+     String url="http://localhost:3000/verify/"+token;
+	 utility.sendEMail(message,"verifying email",url);
+	  kafkaTemplate.flush();  
+	  }
+	 
+	@KafkaListener(topics = "myfundoo2", groupId = "group")
+	 public void consume2(String message) {
+		UserInfo user=userRepository.findByEmail(message);
+		String jwt=utility.generateToken(new User(user.getEmail(),user.getPassword(),new ArrayList<>()));
+		String url="http://localhost:3000/reset/"+jwt;
+		utility.sendEMail(message,"changing password",url);
+	  kafkaTemplate.flush();  
+	  }
 	
 
 	@Override
-	public ResponseEntity<Response> login(LoginDTO logindto) throws LoginException {
+	public String login(LoginDTO logindto) throws LoginException {
 		
-		UserInfo user=userRepository.findByUsername(logindto.getUsername());
+		UserInfo user=userRepository.findByEmail(logindto.getEmail());
 		if(user==null)
 		{
 			throw new LoginException("Register Before Login!");
 		}
-		boolean x=utility.checkVerified(logindto.getUsername());
-		System.out.println(x);
+		boolean x=utility.checkVerified(logindto.getEmail());
 		if(x)
 		{
-			boolean a=logindto.getUsername().equals(user.getUsername());
-			System.out.println(a);
+			boolean a=logindto.getEmail().equals(user.getEmail());
 			boolean b=logindto.getPassword().equals(user.getPassword());
-			System.out.println(b);
 			if(a && b)
 			{
-				String token=utility.generateToken(new User(logindto.getUsername(),logindto.getPassword(),new ArrayList<>()));
-				return  ResponseEntity.ok().body(new Response(200,"Token Received",token));
+				String token=utility.generateToken(new User(logindto.getEmail(),logindto.getPassword(),new ArrayList<>()));
+				return  token;
 			}
-			else
-				
+			else				
 			throw new LoginException("Bad Credentials");
 		}
 		else
-		{
 		 throw new LoginException("You are not a Verified User!");
-		}
+		
 	}
 
 	
 	@Override
-	public ResponseEntity<Response> verifyEmail(String jwt) throws JWTTokenException {
+	public boolean verifyEmail(String jwt) throws JWTTokenException {
 		if(utility.validateToken(jwt))
 		{
-			userRepository.setVerifiedEmail(utility.getUsernameFromToken(jwt));
-			return null;
+			Integer I=userRepository.setVerifiedEmail(utility.getUsernameFromToken(jwt));
+			if(I!=0)
+				return true;
+			else
+				return false;
 		}
 	    throw new JWTTokenException("Not a Valid Token!");
 	}
@@ -146,146 +142,34 @@ public class UserServiceImpl implements UserService,UserDetailsService{
 
 	
 	@Override
-	public void forgotPassword(ForgotDTO forgotdto) {
-		
-	try {
-			
+	public void forgotPassword(ForgotDTO forgotdto) {		
+	try {		
 			UserInfo user=modelMapper.map(forgotdto,UserInfo.class);
-			PassDetails(user.getEmail());
-			
+		    kafkaTemplate.send("myfundoo2",user.getEmail());							
 		} 
-		catch(Exception e) {
-			
+		catch(Exception e) {			
 			e.printStackTrace();
 		
-		}
-		
+		}	
 	}
 
 	
+	@Override
+	public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
+	UserInfo user=userRepository.findByEmail(email);
+	return new User(user.getEmail(),user.getPassword(),new ArrayList<>());		
+	}
+
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-	UserInfo user=userRepository.findByUsername(username);
-	return new User(user.getUsername(),user.getPassword(),new ArrayList<>());
-		
+		UserInfo user=userRepository.findByEmail(username); 
+		return new User(user.getEmail(),user.getPassword(),new ArrayList<>());
 	}
+
 
 	
-	@Override
-	public List<Notes> displayTrashNotesByUser(String jwt) throws JWTTokenException {
-		UserInfo user=null;
-		if(utility.validateToken(jwt))
-		{
-		user=utility.getUser(jwt);
-		List<Notes> notes=userRepository.getTrashedNotesByUser(user.getId());
-		return notes;
-		}
-		else
-		throw new JWTTokenException("Token Not Found Exception");	
-		
-	}
 
-
-	@Override
-	public boolean restoreNoteFromTrash(String jwt, int id) throws JWTTokenException {
-   		
-		UserInfo user=null;
-		if(utility.validateToken(jwt))
-		{
-		user=utility.getUser(jwt);
-		Notes note=userRepository.findNoteById(user,id);
-		int i=userRepository.restoreNoteByUser(user.getId(),note.getId());
-        if(i!=0)
-	    return true;
-        else
-	    return false;
-			}
-		else
-		throw new JWTTokenException("Token Not Found Exception");		
-		}
-
-
-	@Override
-	public boolean deleteNoteFromTrash(String jwt, int id) throws JWTTokenException {
 	
-		UserInfo user=null;
-		if(utility.validateToken(jwt))
-		{
-		user=utility.getUser(jwt);
-		Notes note=userRepository.findNoteById(user,id);
-		int i=userRepository.deleteNoteFromTrashByUser(user.getId(),note.getId());
-        if(i!=0)
-	    return true;
-        else
-	    return false;
-			}
-		else
-		throw new JWTTokenException("Token Not Found Exception");		
 	
-	}
-
-
-	@Override
-	public boolean emptyTrashByUser(String jwt, int id) throws JWTTokenException 
-	{
-		UserInfo user=null;
-		if(utility.validateToken(jwt))
-		{
-		user=utility.getUser(jwt);
-		Notes note=userRepository.findNoteById(user,id);
-		int i=userRepository.emptyTrashForUser(user.getId(),note.getId());
-        if(i!=0)
-	    return true;
-        else
-	    return false;
-			}
-		else
-		throw new JWTTokenException("Token Not Found Exception");	
-		
-		}
-
-
-	@Override
-	public  Object[] displaySortedByName(String jwt) throws JWTTokenException {
-		UserInfo user=null;
-		if(utility.validateToken(jwt))
-		{
-		user=utility.getUser(jwt);
-		Object[] notes=userRepository.getSortedNotesByName(user.getId());
-		System.out.println(notes);
-		return notes;
-		}
-		else
-		throw new JWTTokenException("Token Not Found Exception");	
-
-	}
-
-
-	@Override
-	public Object[] displaySortedById(String jwt) throws JWTTokenException {
-		UserInfo user=null;
-		if(utility.validateToken(jwt))
-		{
-		user=utility.getUser(jwt);
-		Object[] notes=userRepository.getSortedNotesById(user.getId());
-		System.out.println(notes);
-		return notes;
-		}
-		else
-		throw new JWTTokenException("Token Not Found Exception");		}
-
-
-	@Override
-	public Object[] displaySortedByDate(String jwt) throws JWTTokenException {
-		
-		UserInfo user=null;
-		if(utility.validateToken(jwt))
-		{
-		user=utility.getUser(jwt);
-		Object[] notes=userRepository.getSortedNotesByDate(user.getId());
-		System.out.println(notes);
-		return notes;
-		}
-		else
-		throw new JWTTokenException("Token Not Found Exception");	}
 }

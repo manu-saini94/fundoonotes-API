@@ -5,6 +5,8 @@ import java.util.List;
 import javax.security.auth.login.LoginException;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.bridgelabz.fundoonotes.Exceptions.JWTTokenException;
 import com.bridgelabz.fundoonotes.dto.ForgotDTO;
@@ -17,27 +19,17 @@ public interface UserService {
 
 	public boolean Register(UserDTO userdto);
 	
-	public ResponseEntity<Response> login(LoginDTO logindto) throws LoginException;
+	public String login(LoginDTO logindto) throws LoginException;
 	
-	public ResponseEntity<Response> verifyEmail(String jwt) throws JWTTokenException;
+	public boolean verifyEmail(String jwt) throws JWTTokenException;
 	
 	public String resetPassword(String password,String jwt) throws JWTTokenException;
 	
 	public void forgotPassword(ForgotDTO forgotdto);
-	
-	List<Notes> displayTrashNotesByUser(String jwt) throws JWTTokenException;
-	
-	public boolean restoreNoteFromTrash(String jwt, int id) throws JWTTokenException;
-	
-	public boolean deleteNoteFromTrash(String jwt, int id) throws JWTTokenException;
-	
-	public boolean emptyTrashByUser(String jwt, int id) throws JWTTokenException;
 
-	public Object[] displaySortedByName(String jwt) throws JWTTokenException;
-
-	public Object[] displaySortedById(String jwt) throws JWTTokenException;
-
-	public Object[] displaySortedByDate(String jwt) throws JWTTokenException;
+	UserDetails loadUserByEmail(String email) throws UsernameNotFoundException;
+	
+	
 	
 	
 	

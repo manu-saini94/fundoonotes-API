@@ -14,7 +14,9 @@ import com.bridgelabz.fundoonotes.model.Collaborator;
 import com.bridgelabz.fundoonotes.model.Notes;
 import com.bridgelabz.fundoonotes.model.UserInfo;
 import com.bridgelabz.fundoonotes.repository.CollaboratorRepository;
+import com.bridgelabz.fundoonotes.repository.NoteRepository;
 import com.bridgelabz.fundoonotes.service.CollaboratorService;
+import com.bridgelabz.fundoonotes.service.ElasticSearchService;
 import com.bridgelabz.fundoonotes.utility.Utility;
 
 @Service
@@ -24,6 +26,11 @@ public class CollaboratorServiceImpl implements CollaboratorService{
 	CollaboratorRepository collaboratorRepository;
 	Utility utility;
 	
+	@Autowired
+	private NoteRepository noteRepository;
+	
+	@Autowired
+	private ElasticSearchService elasticService;
 	
 	@Autowired
 	public CollaboratorServiceImpl(CollaboratorRepository collaboratorRepository, Utility utility) {
@@ -40,7 +47,15 @@ public class CollaboratorServiceImpl implements CollaboratorService{
 			Notes note = collaboratorRepository.getNotes(collaboratordto.getNoteId());
 			if (utility.checkCollaborator(note, collaboratordto.getCollaborator())) {
 				Collaborator collaborator = new Collaborator(collaboratordto.getCollaborator(), note);
-				collaboratorRepository.save(collaborator);	
+				collaboratorRepository.save(collaborator);
+				
+				Notes note1=noteRepository.getNoteByNoteId(collaboratordto.getNoteId(),user.getId());
+				try {
+					elasticService.updateNote(note1);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				return true;
 			}
 			else
@@ -54,10 +69,19 @@ public class CollaboratorServiceImpl implements CollaboratorService{
 
 	@Override
 	public boolean deleteCollaborator(CollaboratorDTO collaboratordto, String jwt) throws CollaboratorNotFoundException {
+	    UserInfo user=utility.getUser(jwt);
+
 		if(collaboratorRepository.getCollaborator(collaboratordto.getCollaborator(),collaboratordto.getNoteId())!=null)
 	    {
 			collaboratorRepository.deleteCollaboratorFromNote(collaboratordto.getCollaborator(), collaboratordto.getNoteId());
-	    return true;
+			Notes note1=noteRepository.getNoteByNoteId(collaboratordto.getNoteId(),user.getId());
+			try {
+				elasticService.updateNote(note1);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return true;
 	    }
 		else
 				throw new CollaboratorNotFoundException("No collaborator found");

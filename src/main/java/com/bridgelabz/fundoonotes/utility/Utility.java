@@ -19,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import com.bridgelabz.fundoonotes.dto.UserDTO;
 import com.bridgelabz.fundoonotes.model.Notes;
 import com.bridgelabz.fundoonotes.model.UserInfo;
+import com.bridgelabz.fundoonotes.repository.NoteRepository;
 import com.bridgelabz.fundoonotes.repository.UserRepository;
 
 import io.jsonwebtoken.Claims;
@@ -35,6 +36,10 @@ public class Utility {
 	
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	NoteRepository noteRepository;
+	
 	
 	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 	
@@ -90,7 +95,6 @@ public class Utility {
 			mail.setSubject(subject);
 			mail.setText(message);
 			mail.setFrom("manu.saini931222@gmail.com");
-			System.out.println(mail);
 			javaMailSender.send(mail);
 		}
 		
@@ -109,9 +113,9 @@ public class Utility {
 		}
 	
 		
-		public boolean checkVerified(String username)
+		public boolean checkVerified(String email)
 		{
-			UserInfo user=userRepository.findByUsername(username);
+			UserInfo user=userRepository.findByEmail(email);
 			return user.isEmailVerified();
 		}
 		
@@ -123,16 +127,15 @@ public class Utility {
 		@Cacheable(value="cacheExec",key="#jwt")
 		public UserInfo getUser(String jwt)
 		{
-			UserInfo user=userRepository.findByUsername(getUsernameFromToken(jwt));
+			UserInfo user=userRepository.findByEmail(getUsernameFromToken(jwt));
 			return user;
 		}
 		
 		public boolean checkCollaborator(Notes note,String email)
 		{
-			if(userRepository.getCollaborator(email,note)!=null)
+			if(noteRepository.getCollaborator(email,note)!=null)
 				return false;
-			else
-				
+			else		
 				return true;
 			
 		}

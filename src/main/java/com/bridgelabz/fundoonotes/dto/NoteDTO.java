@@ -1,19 +1,35 @@
 package com.bridgelabz.fundoonotes.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class NoteDTO {
 
+	private int id;
+	
 	private String title;
 	private String takeanote;
 	private boolean trashed;
-	private boolean archieved;
+	private boolean archived;
 	private boolean pinned;
 	private String color;
-	private String reminder;
+	private LocalDateTime reminder;
 	private String labelname;
+	private LocalDateTime createdtime=LocalDateTime.now();
 
 
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public LocalDateTime getCreatedtime() {
+		return createdtime;
+	}
+	public void setCreatedtime(LocalDateTime createdtime) {
+		this.createdtime = createdtime;
+	}
 	public String getLabelname() {
 		return labelname;
 	}
@@ -33,12 +49,8 @@ public class NoteDTO {
 		this.takeanote = takeanote;
 	}
 	
-	public boolean isArchieved() {
-		return archieved;
-	}
-	public void setArchieved(boolean archieved) {
-		this.archieved = archieved;
-	}
+	
+	
 	public boolean isPinned() {
 		return pinned;
 	}
@@ -51,10 +63,11 @@ public class NoteDTO {
 	public void setColor(String color) {
 		this.color = color;
 	}
-	public String getReminder() {
+	
+	public LocalDateTime getReminder() {
 		return reminder;
 	}
-	public void setReminder(String reminder) {
+	public void setReminder(LocalDateTime reminder) {
 		this.reminder = reminder;
 	}
 	public boolean isTrashed() {
@@ -63,5 +76,22 @@ public class NoteDTO {
 	public void setTrashed(boolean trashed) {
 		this.trashed = trashed;
 	}
+	public boolean isArchived() {
+		return archived;
+	}
+	public void setArchived(boolean archived) {
+		this.archived = archived;
+	}
+	
+	
+	@Override
+	public String toString() {
+		return "NoteDTO [id=" + id + ", title=" + title + ", takeanote=" + takeanote + ", trashed=" + trashed
+				+ ", archived=" + archived + ", pinned=" + pinned + ", color=" + color + ", reminder=" + reminder
+				+ ", labelname=" + labelname + ", createdtime=" + createdtime + "]";
+	}
+
+	
+	
 	
 }

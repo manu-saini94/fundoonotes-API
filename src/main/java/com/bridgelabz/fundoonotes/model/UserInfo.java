@@ -20,7 +20,7 @@ public class UserInfo implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
-	private String username;
+	private String mobileno;
 	private String Firstname;
 	
     private String Lastname;
@@ -74,11 +74,12 @@ public class UserInfo implements Serializable {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public String getUsername() {
-		return username;
+
+	public String getMobileno() {
+		return mobileno;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+	public void setMobileno(String mobileno) {
+		this.mobileno = mobileno;
 	}
 	public String getFirstname() {
 		return Firstname;
@@ -107,7 +108,7 @@ public class UserInfo implements Serializable {
 	}
 	@Override
 	public String toString() {
-		return "UserInfo [id=" + id + ", username=" + username + ", Firstname=" + Firstname + ", Lastname=" + Lastname
+		return "UserInfo [id=" + id + ", mobileno=" + mobileno + ", Firstname=" + Firstname + ", Lastname=" + Lastname
 				+ ", email=" + email + ",  isEmailVerified=" + isEmailVerified + ",password=" + password
 				+ ", createddate=" + createddate + "]";
 	}

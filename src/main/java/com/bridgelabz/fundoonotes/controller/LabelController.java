@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,11 +21,13 @@ import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.NoteNotFoundException;
 import com.bridgelabz.fundoonotes.dto.LabelDTO;
 import com.bridgelabz.fundoonotes.dto.NoteDTO;
+import com.bridgelabz.fundoonotes.model.Labels;
 import com.bridgelabz.fundoonotes.response.Response;
 import com.bridgelabz.fundoonotes.service.LabelService;
 
 @RestController
 @RequestMapping("/label")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class LabelController {
 
 	@Autowired
@@ -99,7 +102,7 @@ public class LabelController {
 	@GetMapping("displaylabels/{jwt}")
 	public ResponseEntity<Response> displayAllLabelsForUser(@PathVariable("jwt") String jwt) throws LabelNotFoundException, JWTTokenException
 	{
-		List<String> list=labelService.displayAllLabels(jwt);
+		List<Labels> list=labelService.displayAllLabels(jwt);
 		
 		if(list!=null)
 		{

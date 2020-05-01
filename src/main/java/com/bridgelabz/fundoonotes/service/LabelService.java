@@ -6,6 +6,7 @@ import com.bridgelabz.fundoonotes.Exceptions.JWTTokenException;
 import com.bridgelabz.fundoonotes.Exceptions.LabelNotFoundException;
 import com.bridgelabz.fundoonotes.Exceptions.NoteNotFoundException;
 import com.bridgelabz.fundoonotes.dto.LabelDTO;
+import com.bridgelabz.fundoonotes.model.Labels;
 
 public interface LabelService {
 
@@ -17,7 +18,7 @@ public interface LabelService {
 	
 	public boolean displayNoteForLabel(int id,String jwt) throws NoteNotFoundException;
 
-	public List<String> displayAllLabels(String jwt) throws LabelNotFoundException, JWTTokenException;
+	public List<Labels> displayAllLabels(String jwt) throws LabelNotFoundException, JWTTokenException;
 	
 	
 	

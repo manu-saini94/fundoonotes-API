@@ -1,5 +1,6 @@
 package com.bridgelabz.fundoonotes.model;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class Notes {
 	private String title;
     private String takeanote;
     @Column(columnDefinition="boolean default false")
-    private boolean archieved;
+    private boolean archived;
    
 
 	@Column(columnDefinition="boolean default false")
@@ -35,15 +36,16 @@ public class Notes {
     @Column(columnDefinition="boolean default false")
     private boolean pinned;
     
-    @Column(columnDefinition="timestamp default current_timestamp")
-    private Date reminder;
+    @Column()
+    private LocalDateTime reminder;
     
     private String color;
-    @LastModifiedDate
-    private Date lastupdate;
+    
+    @Column()
+    private LocalDateTime lastupdate=LocalDateTime.now();
    
-   @Column(columnDefinition="timestamp default current_timestamp")
-   private Date CreatedTime;
+   @Column()
+   private LocalDateTime CreatedTime=LocalDateTime.now();
    
    @JsonIgnore
    @ManyToOne
@@ -76,12 +78,14 @@ public Notes(String title, String takeanote, String color, UserInfo userdetails)
 
 
 
-public Date getReminder() {
+
+
+public LocalDateTime getReminder() {
 	return reminder;
 }
 
 
-public void setReminder(Date reminder) {
+public void setReminder(LocalDateTime reminder) {
 	this.reminder = reminder;
 }
 
@@ -133,13 +137,13 @@ public void setTakeanote(String takeanote) {
 }
 
 
-public boolean isArchieved() {
-	return archieved;
+public boolean isArchived() {
+	return archived;
 }
 
 
-public void setArchieved(boolean archieved) {
-	this.archieved = archieved;
+public void setArchived(boolean archived) {
+	this.archived = archived;
 }
 
 
@@ -173,22 +177,30 @@ public void setColor(String color) {
 }
 
 
-public Date getLastupdate() {
+
+
+
+public LocalDateTime getLastupdate() {
 	return lastupdate;
 }
 
 
-public void setLastupdate(Date lastupdate) {
+public void setLastupdate(LocalDateTime lastupdate) {
 	this.lastupdate = lastupdate;
 }
 
 
-public Date getCreatedTime() {
+
+
+
+
+
+public LocalDateTime getCreatedTime() {
 	return CreatedTime;
 }
 
 
-public void setCreatedTime(Date createdTime) {
+public void setCreatedTime(LocalDateTime createdTime) {
 	CreatedTime = createdTime;
 }
 
@@ -205,9 +217,13 @@ public void setUserdetails(UserInfo userdetails) {
 
 @Override
 public String toString() {
-	return "Notes [id=" + id + ", title=" + title + ", takeanote=" + takeanote + ", archieved=" + archieved
-			+ ", trashed=" + trashed + ", pinned=" + pinned + ", reminder=" + reminder + ", color=" + color
-			+ ", CreatedTime=" + CreatedTime + ", userinfo="+userdetails+"]";
+	return "Notes [id=" + id + ", title=" + title + ", takeanote=" + takeanote + ", archived=" + archived + ", trashed="
+			+ trashed + ", pinned=" + pinned + ", reminder=" + reminder + ", color=" + color + ", lastupdate="
+			+ lastupdate + ", CreatedTime=" + CreatedTime + ", userdetails=" + userdetails + ", labels=" + labels
+			+ ", collaborator=" + collaborator + "]";
 }
+
+
+
 
 }

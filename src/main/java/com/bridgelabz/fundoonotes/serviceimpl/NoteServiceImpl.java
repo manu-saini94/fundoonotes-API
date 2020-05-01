@@ -1,5 +1,7 @@
 package com.bridgelabz.fundoonotes.serviceimpl;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +19,8 @@ import com.bridgelabz.fundoonotes.model.Notes;
 import com.bridgelabz.fundoonotes.model.UserInfo;
 import com.bridgelabz.fundoonotes.repository.LabelRepository;
 import com.bridgelabz.fundoonotes.repository.NoteRepository;
+import com.bridgelabz.fundoonotes.repository.UserRepository;
+import com.bridgelabz.fundoonotes.service.ElasticSearchService;
 import com.bridgelabz.fundoonotes.service.NoteService;
 import com.bridgelabz.fundoonotes.utility.Utility;
 
@@ -27,6 +31,11 @@ public class NoteServiceImpl implements NoteService
 	@Autowired
 	LabelRepository labelRepository;
 	
+	@Autowired
+	UserRepository userRep;
+	
+	@Autowired
+	private ElasticSearchService elasticService;
 	
 NoteRepository noteRepository;
 Utility utility;
@@ -40,20 +49,38 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 	this.mapper=mapper;
 }
 	@Override
-	public boolean saveNewNote(NoteDTO notedto, String jwt) throws JWTTokenException, UserException {
+	public Notes saveNewNote(NoteDTO notedto, String jwt) throws JWTTokenException, UserException {
 	
-		UserInfo user=utility.getUser(jwt);
-		if(user!=null)
+		String user=utility.getUsernameFromToken(jwt);
+		System.out.println(user);
+	
+	UserInfo us=userRep.findByEmail(user);
+	System.out.println(us);
+		
+		if(us!=null)
 		{
-			System.out.println(user);
+			System.out.println(us);
 		
 		Notes notes= new Notes();
 		 notes.setTitle(notedto.getTitle());
 		 notes.setTakeanote(notedto.getTakeanote());
-		 notes.setUserdetails(user);
-		   noteRepository.save(notes);
+		 notes.setPinned(notedto.isPinned());
+		 notes.setTrashed(notedto.isTrashed());
+		 notes.setArchived(notedto.isArchived());
+		 notes.setColor(notedto.getColor());
+		 notes.setReminder(notedto.getReminder());
+		 notes.setCreatedTime(LocalDateTime.now());
+		 
+		 notes.setUserdetails(us);
+		   Notes note=noteRepository.save(notes);
+		   
+		   try {
+			elasticService.createNote(note);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-	    return true;
+	    return note;
 			
 		}
 		else
@@ -62,15 +89,66 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		}
 		
 	}
+	
+	@Override
+	public Notes updateToNote(NoteDTO notedto, String jwt) throws JWTTokenException, UserException, NoteNotFoundException {
+		Notes n=null;
+		String user=utility.getUsernameFromToken(jwt);
+		System.out.println(user);
+	
+	UserInfo us=userRep.findByEmail(user);
+	System.out.println(us);
+		
+		if(us!=null)
+		{
+			Notes note=noteRepository.findNoteById(notedto.getId(),us.getId()).orElseThrow(()-> new NoteNotFoundException("Noteid Not exist"));
+			
+			note.setTitle(notedto.getTitle());
+			note.setTakeanote(notedto.getTakeanote());
+			 note.setPinned(notedto.isPinned());
+			 note.setTrashed(notedto.isTrashed());
+			 note.setArchived(notedto.isArchived());
+			 note.setColor(notedto.getColor());
+			 note.setReminder(notedto.getReminder());
+			 note.setCreatedTime(LocalDateTime.now());
+			   Notes note1=noteRepository.save(note);
+
+				try {
+					elasticService.updateNote(note1);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if(note1!=null)
+				return note1;
+				else
+					return null;
+			
+		}
+		else
+		{
+			throw new UserException("No User for this Username");
+		}
+		
+	}
+	
 	@Override
 	public boolean deleteNote(int id1, String jwt) throws UserException {
         UserInfo user=utility.getUser(jwt);
         if(user!=null)
         {
-        	if(noteRepository.deleteNoteById(id1,user.getId())!=0)
+        	Notes note=noteRepository.getNoteByNoteId(id1,user.getId());
+        	note.setTrashed(true);
+        	Notes updatednote=noteRepository.save(note);
+        	
+    			try {
+    				elasticService.updateNote(updatednote);
+    			} catch (Exception e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
         		return true;
-        	else
-        		return false;	
+        	
         }
         else
         {
@@ -93,7 +171,13 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		    labelRepository.save(labels);
 			Labels labels1=labelRepository.getLabelByName(updatedto.getLabelname(),user.getId());
 			noteRepository.saveLabelInNote(id,labels1.getId());
-				
+			Notes note1=noteRepository.getNoteByNoteId(id,user.getId());
+			try {
+				elasticService.updateNote(note1);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 				return true;
 		 }
 			else
@@ -101,6 +185,13 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 			{
 				Labels labels1=labelRepository.getLabelByName(updatedto.getLabelname(),user.getId());
 				noteRepository.saveLabelInNote(id,labels1.getId());
+				Notes note1=noteRepository.getNoteByNoteId(id,user.getId());
+
+				try {
+					elasticService.updateNote(note1);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				return true;
 			}
 				
@@ -126,6 +217,12 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		if(note!=null)
 		{
 		noteRepository.deleteLabelInNote(note.getId(),id1);
+		Notes note1=noteRepository.getNoteByNoteId(note.getId(),user.getId());
+		try {
+			elasticService.updateNote(note1);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return true;
 		}
 		else
@@ -145,100 +242,41 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		if(utility.validateToken(jwt))
 		{
 			user=utility.getUser(jwt);
-			Notes note=noteRepository.findNoteById(id,user.getId());
-			if(note!=null)
-			{
-              if(!note.isPinned() && note.isArchieved())
-              {
-            	 int i=noteRepository.setPinning(true,user.getId(),id);
-            	 int j=noteRepository.setArchieving(false,user.getId(),id);
-            	 if(i!=0 && j!=0)
-            		 flag=true;
-            	 else
-            		 flag=false;
-              }
-              else
-            	  if(!note.isPinned() && !note.isArchieved())
-              {
-                 	 int i=noteRepository.setPinning(true,user.getId(),id);       
-              if(i!=0)
-            	  flag=true;
-              else
-            	  flag=false;
-              }
-            	else
-            	 if(note.isPinned())
-            	 {
-                    int i=noteRepository.setPinning(false,user.getId(),id);
-                if(i!=0)
-        	    flag=true;
-                else
-        	    flag=false;
-            	 }
-              return flag;
-			}
-			else
-			{
-			throw new NoteNotFoundException("Note Not Found Exception");
-			}
-			
-		}
+			Notes note=noteRepository.findNoteById(id,user.getId()).orElseThrow(()-> new NoteNotFoundException("Note Not Found Exception")); 
+            	  note.setPinned(!note.isPinned());
+            	  note.setArchived(false);  	         	 		        
+          	Notes notesupdate = noteRepository.save(note);
+    		try {
+    			elasticService.updateNote(notesupdate);
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		}
+		}	
 		else
-		{
-	    	throw new JWTTokenException("Token Not Found Exception");	
-		}
+	    	throw new JWTTokenException("Token Not Found Exception");			
+		return true;
 	}
 	
 	@Override
-	public boolean updateArchieveForNote(int id, String jwt) throws NoteNotFoundException, JWTTokenException {
+	public boolean updateArchiveForNote(int id, String jwt) throws NoteNotFoundException, JWTTokenException {
 		UserInfo user=null;
 		boolean flag=false;
 		if(utility.validateToken(jwt))
 		{
 			user=utility.getUser(jwt);
-			Notes note=noteRepository.findNoteById(id,user.getId());
-			if(note!=null)
-			{
-              if(!note.isArchieved() &&  note.isPinned())
-              {
-             	 int i=noteRepository.setArchieving(true,user.getId(),id);
-            	 int j=noteRepository.setPinning(false,user.getId(),id);
-            	 if(i!=0 && j!=0)
-            		 flag=true;
-            	 else
-            		 flag=false;
-              }
-              else
-            	  if(!note.isPinned() && !note.isArchieved())
-              {
-                  	 int i=noteRepository.setArchieving(true,user.getId(),id);
-              if(i!=0)
-            	  flag=true;
-              else
-            	  flag=false;
-              }
-            	else
-            	 if(note.isArchieved())
-            	 {
-                    int i=noteRepository.setArchieving(false,user.getId(),id);
-                if(i!=0)
-        	    flag=true;
-                else
-        	    flag=false;
-            	 }
-              return flag;
-			}
-			else
-			{
-			throw new NoteNotFoundException("Note Not Found Exception");
-			}
-			
+			Notes note=noteRepository.findNoteById(id,user.getId()).orElseThrow(()-> new NoteNotFoundException("Note Not Found Exception"));
+			 note.setArchived(!note.isArchived());
+       	  note.setPinned(false);  	     
+       	Notes notesupdate = noteRepository.save(note);
+		try {
+			elasticService.updateNote(notesupdate);
+		} catch (Exception e) {
+			e.printStackTrace();
+		 }
 		}
-		else
-		{
-	    	throw new JWTTokenException("Token Not Found Exception");	
-		}
-		
+		else		
+	    	throw new JWTTokenException("Token Not Found Exception");		
+		return true;
 
 		
 		
@@ -250,6 +288,7 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 		if(utility.validateToken(jwt))
 		{
 		user=utility.getUser(jwt);
+		System.out.println(user);
 		List<Notes> notes=noteRepository.getNotesByUser(user.getId());
 		return notes;
 		}
@@ -275,21 +314,24 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 	}
 	
 	@Override
-	public boolean updateColorForNote(String jwt, int id, String color) throws JWTTokenException {
+	public boolean updateColorForNote(String jwt, int id, String color) throws JWTTokenException, NoteNotFoundException {
 	
 		UserInfo user=null;
 		boolean flag=false;
 		if(utility.validateToken(jwt))
 		{
 			user=utility.getUser(jwt);
-			Notes note=noteRepository.findNoteById(id,user.getId());
-			int i=noteRepository.setColorForNote(color,note.getId());
-			if(i!=0)
-			{
+			Notes note=noteRepository.findNoteById(id,user.getId()).orElseThrow(()-> new NoteNotFoundException("Noteid Not exist"));		
+			note.setColor(color);	
+	       	Notes notesupdate = noteRepository.save(note);
+				try {
+					elasticService.updateNote(notesupdate);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				return true;
-			}
-			else
-				return false;
+		
 		}
 		else
 			throw new JWTTokenException("Token Not Found Exception");
@@ -297,7 +339,189 @@ public NoteServiceImpl(NoteRepository noteRepository,Utility utility,ModelMapper
 	}
 
 	
+	@Override
+	public List<Notes> displayTrashNotesByUser(String jwt) throws JWTTokenException {
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		List<Notes> notes=noteRepository.getTrashedNotesByUser(user.getId());
+		return notes;
+		}
+		else
+		throw new JWTTokenException("Token Not Found Exception");	
+		
+	}
 
+
+	@Override
+	public boolean restoreNoteFromTrash(String jwt, int id) throws JWTTokenException {
+   		
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		Notes note=noteRepository.findNoteById(user,id);
+		note.setTrashed(false);
+    	Notes updatednote=noteRepository.save(note);
+			try {
+				elasticService.updateNote(updatednote);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(updatednote!=null)
+				return true;
+				else
+					return false;	
+		}
+		else
+		throw new JWTTokenException("Token Not Found Exception");
+		}
+
+
+	@Override
+	public boolean deleteNoteFromTrash(String jwt, int id) throws JWTTokenException {
+	
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		Notes note=noteRepository.findNoteById(user,id);
+		int i=noteRepository.deleteNoteFromTrashByUser(user.getId(),note.getId());
+        if(i!=0)
+        {
+			try {
+				elasticService.deleteNote(note);
+				System.out.println("deleted from trash"+note);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	    return true;
+        }
+        else
+	    return false;
+			}
+		else
+		throw new JWTTokenException("Token Not Found Exception");		
+	
+	}
+
+
+	@Override
+	public boolean emptyTrashByUser(String jwt) throws JWTTokenException 
+	{
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		List<Notes> notes=noteRepository.getTrashedNotesByUser(user.getId());
+		System.out.println("trashed notes :"+notes);
+		int i=noteRepository.emptyTrashForUser(user.getId());
+        if(i!=0)
+        {
+        	for(Notes n:notes)
+	   		{
+				try {
+					elasticService.deleteNote(n);
+					System.out.println("deleted each :"+n);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	   		}
+	    return true;
+        }
+        else
+	    return false;
+			}
+		else
+		throw new JWTTokenException("Token Not Found Exception");	
+		
+		}
+
+
+	@Override
+	public  Object[] displaySortedByName(String jwt) throws JWTTokenException {
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		Object[] notes=noteRepository.getSortedNotesByName(user.getId());
+		System.out.println(notes);
+		return notes;
+		}
+		else
+		throw new JWTTokenException("Token Not Found Exception");	
+
+	}
+
+
+	@Override
+	public Object[] displaySortedById(String jwt) throws JWTTokenException {
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		Object[] notes=noteRepository.getSortedNotesById(user.getId());
+		System.out.println(notes);
+		return notes;
+		}
+		else
+		throw new JWTTokenException("Token Not Found Exception");		}
+
+
+	@Override
+	public Object[] displaySortedByDate(String jwt) throws JWTTokenException {
+		
+		UserInfo user=null;
+		if(utility.validateToken(jwt))
+		{
+		user=utility.getUser(jwt);
+		Object[] notes=noteRepository.getSortedNotesByDate(user.getId());
+		System.out.println(notes);
+		return notes;
+		}
+		else
+		throw new JWTTokenException("Token Not Found Exception");	}
+	
+	
+	
+	@Override
+	public boolean updateTitleAndTakeanote(int id, String jwt,NoteDTO notedto) throws JWTTokenException, NoteNotFoundException {
+		UserInfo user=null;
+		boolean flag=false;
+		if(utility.validateToken(jwt))
+		{
+			user=utility.getUser(jwt);
+			Notes note=noteRepository.findNoteById(id,user.getId()).orElseThrow(()-> new NoteNotFoundException("Noteid Not exist"));
+					
+			note.setTitle(notedto.getTitle());
+			note.setTakeanote(notedto.getTakeanote());
+			 note.setPinned(notedto.isPinned());
+			 note.setTrashed(notedto.isTrashed());
+			 note.setArchived(notedto.isArchived());
+			 note.setColor(notedto.getColor());
+			 note.setReminder(notedto.getReminder());
+			 note.setCreatedTime(LocalDateTime.now());
+			   Notes note1=noteRepository.save(note);
+
+				try {
+					elasticService.updateNote(note1);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if(note1!=null)
+				return true;
+				else
+					return false;
+		
+		}
+		else
+			throw new JWTTokenException("Token Not Found Exception");
+	}
+	
 	
 
 	

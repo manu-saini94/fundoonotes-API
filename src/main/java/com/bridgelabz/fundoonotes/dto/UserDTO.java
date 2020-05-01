@@ -5,8 +5,8 @@ import javax.validation.constraints.Size;
 
 public class UserDTO {
 
-	@NotNull(message=" Username cannot be empty ")
-	private String username;
+	@NotNull(message=" Mobile number cannot be empty ")
+	private String mobileno;
 	@NotNull(message=" First name cannot be empty")
 	private String firstname;
 	@NotNull(message=" Last name cannot be empty")
@@ -24,11 +24,12 @@ public class UserDTO {
 	private String passwordagain;
 	
 	
-	public String getUsername() {
-		return username;
+
+	public String getMobileno() {
+		return mobileno;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+	public void setMobileno(String mobileno) {
+		this.mobileno = mobileno;
 	}
 	public String getFirstname() {
 		return firstname;

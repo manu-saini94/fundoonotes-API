@@ -2,6 +2,7 @@ package com.bridgelabz.fundoonotes.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,8 +24,11 @@ import com.bridgelabz.fundoonotes.service.CollaboratorService;
 @RequestMapping("/collab")
 public class CollaboratorController {
 
-	
+	@Autowired
 	CollaboratorService collaboratorService;
+	
+	
+	
 	
 	@PostMapping("/add")
 	public ResponseEntity<Response> addCollaboratorForNote(@RequestBody CollaboratorDTO collaboratordto,@RequestHeader("jwt") String jwt) throws EmailAlreadyExistException, UserException
@@ -34,13 +38,13 @@ public class CollaboratorController {
 			return ResponseEntity.ok().body(new Response(200,"Collaborator Added to Note",collaboratordto.getNoteId()));
 		}
 		else
-		{
+		{			
 			return ResponseEntity.badRequest().body(new Response(400,"Already collaborated",collaboratordto.getNoteId()));
 		}
 		
 	}
 	
-	@DeleteMapping("/delete")
+	@PostMapping("/delete")
 	public ResponseEntity<Response> deleteCollaboratorForNote(@RequestBody CollaboratorDTO collaboratordto,@RequestHeader("jwt") String jwt) throws CollaboratorNotFoundException
 	{
 		if(collaboratorService.deleteCollaborator(collaboratordto,jwt))
